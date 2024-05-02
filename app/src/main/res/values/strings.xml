@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">HolidayCountDown</string>
+    <string name="widget_description">假期倒计时小组件</string>
+</resources>
