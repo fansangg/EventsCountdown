@@ -1,6 +1,7 @@
 package fan.san.holidaycountdown.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.preferences.core.edit
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.updateAppWidgetState
@@ -24,20 +25,18 @@ class SettingsViewModel @Inject constructor(@ApplicationContext private val cont
 
 
     fun updateWidgetAlpha(newValue: Float) {
+        Log.d("fansangg", "updateWidgetAlpha: $newValue")
         viewModelScope.launch {
             context.dataStore.edit {
                 it[WidgetStyles.backgroundAlpha] = newValue
             }
-
             GlanceAppWidgetManager(context).apply {
-                getGlanceIds(HolidayCountDownWidget::class.java).lastOrNull()
-                    ?.let {
-                        updateAppWidgetState(context, it) { prefs ->
-                            prefs[WidgetStyles.backgroundAlpha] = newValue
-                        }
-                        HolidayCountDownWidget().update(context, it)
+                getGlanceIds(HolidayCountDownWidget::class.java).lastOrNull()?.let {
+                    updateAppWidgetState(context, it) { prefs ->
+                        prefs[WidgetStyles.backgroundAlpha] = newValue
                     }
-
+                    HolidayCountDownWidget().update(context,it)
+                }
             }
 
         }

@@ -13,6 +13,8 @@ glance = "1.1.0-beta02"
 ksp = "1.9.23-1.0.20"
 hiltAndroid = "2.49"
 composeCompiler = "1.5.12"
+navigation = "2.7.7"
+hiltNavigation = "1.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -34,6 +36,8 @@ androidx-datastore = {group="androidx.datastore",name="datastore-preferences",ve
 androidx-glance = {group="androidx.glance",name="glance-appwidget",version.ref="glance"}
 hilt-android = {group = "com.google.dagger",name="hilt-android",version.ref="hiltAndroid"}
 hilt-android-compiler = {group = "com.google.dagger",name="hilt-android-compiler",version.ref="hiltAndroid"}
+androidx-navigation = {group = "androidx.navigation",name="navigation-compose",version.ref = "navigation"}
+hilt-navigation = {group="androidx.hilt",name="hilt-navigation-compose",version.ref = "hiltNavigation"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

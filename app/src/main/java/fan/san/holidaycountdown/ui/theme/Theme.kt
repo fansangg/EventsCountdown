@@ -1,6 +1,5 @@
 package fan.san.holidaycountdown.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +42,13 @@ fun HolidayCountDownTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
+
+    /*val view = LocalView.current
+    SideEffect {
+        val window = (view.context as Activity).window
+        window.statusBarColor = colorScheme.secondaryContainer.toArgb()
+        WindowCompat.getInsetsController(window,view).isAppearanceLightStatusBars = !darkTheme
+    }*/
 
     MaterialTheme(
         colorScheme = colorScheme, typography = Typography, content = content
