@@ -2,21 +2,23 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.READ_CALENDAR"/>
+
     <application
-        android:name=".HolidayCountDownApp"
+        android:name=".EventsCountdownApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/events"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/events"
         android:supportsRtl="true"
-        android:theme="@style/Theme.HolidayCountDown"
+        android:theme="@style/Theme.EventsCountdown"
         >
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.HolidayCountDown">
+            android:theme="@style/Theme.EventsCountdown">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
@@ -24,7 +26,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".widget.HolidayCountDownWidgetReceiver"
+        <receiver android:name=".widget.EventsCountdownWidgetReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

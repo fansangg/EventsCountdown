@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">HolidayCountDown</string>
-    <string name="widget_description">假期倒计时小组件</string>
+    <string name="app_name">倒数日</string>
+    <string name="widget_description">日历事件倒数日</string>
 </resources>

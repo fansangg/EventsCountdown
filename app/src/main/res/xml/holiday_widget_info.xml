@@ -6,7 +6,7 @@
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="86400000"
     android:description="@string/widget_description"
-    android:configure="fan.san.holidaycountdown.MainActivity"
+    android:configure="fan.san.eventscountdown.MainActivity"
     android:widgetFeatures="reconfigurable"
     >
 </appwidget-provider>

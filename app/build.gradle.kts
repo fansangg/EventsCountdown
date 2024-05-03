@@ -6,13 +6,13 @@ plugins {
 }
 
 android {
-    namespace = "fan.san.holidaycountdown"
-    compileSdk = 34
+    namespace = "fan.san.eventscountdown"
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "fan.san.holidaycountdown"
-        minSdk = 33
-        targetSdk = 34
+        applicationId = "fan.san.eventscountdown"
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
 
@@ -40,6 +40,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
@@ -48,6 +49,12 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
+        arg("room.incremental", "true")
+        arg("room.generateKotlin", "true")
     }
 }
 
@@ -75,4 +82,9 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.navigation)
     implementation(libs.hilt.navigation)
+    implementation(libs.google.accompanist.permission)
+    implementation(libs.androidx.room)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.lottie.compose)
 }
