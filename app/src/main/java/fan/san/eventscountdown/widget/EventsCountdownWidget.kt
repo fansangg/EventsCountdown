@@ -23,25 +23,36 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import dagger.hilt.EntryPoints
+import fan.san.eventscountdown.utils.CommonUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  *@author  范三
  *@version 2024/5/2
  */
-
-class EventsCountdownWidget : GlanceAppWidget() {
+class EventsCountdownWidget: GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+
+        val repository = EntryPoints.get(context,WidgetEntryPoint::class.java).getCountdownRepository()
+        val nextEvents = withContext(Dispatchers.IO){
+            repository.getNextEvents()
+        }
+        Log.d("fansangg", "provideGlance: 小组件更新1")
         provideContent {
+            Log.d("fansangg", "provideGlance: 小组件更新2")
             val prefs = currentState<Preferences>()
             val defaultTextStyle = TextStyle(color = ColorProvider(Color.White))
+
             GlanceTheme {
                 Column(
                     modifier = GlanceModifier.padding(horizontal = 14.dp, vertical = 10.dp)
-                        .fillMaxSize().background(Color.Black.copy(alpha =  prefs[WidgetStyles.backgroundAlpha]?:1f))
+                        .fillMaxSize().background(Color.Black.copy(alpha =  prefs[CountdownWidgetStyles.backgroundAlpha]?:1f))
                 ) {
                     Text(
-                        text = "劳动节",
+                        text = nextEvents.title,
                         style = defaultTextStyle.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp
@@ -55,7 +66,7 @@ class EventsCountdownWidget : GlanceAppWidget() {
                         Row {
                             Text(text = "剩余 ", style = defaultTextStyle)
                             Text(
-                                text = "365",
+                                text = CommonUtil.getDaysDiff(nextEvents.startDateTime),
                                 style = defaultTextStyle.copy(
                                     fontSize = 38.sp,
                                     fontWeight = FontWeight.Bold

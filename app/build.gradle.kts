@@ -49,6 +49,11 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+
+        dex {
+            //解决minsdk > 28 包体积变大
+            useLegacyPackaging = true
+        }
     }
 
     ksp {
@@ -87,4 +92,6 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.lottie.compose)
+//    implementation(libs.androidx.work)
+    implementation(libs.androidx.work.ktx)
 }

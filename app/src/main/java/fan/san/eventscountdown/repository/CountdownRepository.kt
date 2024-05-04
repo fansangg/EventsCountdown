@@ -24,6 +24,7 @@ class CountdownRepository @Inject constructor(
     suspend fun insert(events: List<Events>) = eventsDao.insert(events)
     suspend fun delete(events: Events) = eventsDao.delete(events)
     suspend fun update(isShow: Boolean, id: Long) = eventsDao.update(if (isShow) 1 else 0, id)
+    fun getNextEvents() = eventsDao.getNextEvents(System.currentTimeMillis().todayZeroTime)
 
     fun queryCalendarAccounts(): List<CalendarAccountBean> {
         val list = mutableListOf<CalendarAccountBean>()

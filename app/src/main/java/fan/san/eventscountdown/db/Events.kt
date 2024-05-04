@@ -32,5 +32,8 @@ data class Events(
         suspend fun delete(vararg events: Events):Int
         @Query("UPDATE events SET isShow = :isShow where id = :id")
         suspend fun update(isShow: Int,id: Long):Int
+
+        @Query("SELECT * FROM events WHERE start_date_time > :time ORDER BY start_date_time LIMIT 1")
+        fun getNextEvents(time: Long):Events
     }
 }

@@ -1,6 +1,8 @@
 package fan.san.eventscountdown.utils
 
+import android.content.Context
 import android.icu.util.Calendar
+import androidx.work.WorkManager
 import kotlin.time.Duration.Companion.milliseconds
 
 object CommonUtil {
@@ -24,5 +26,11 @@ object CommonUtil {
         val todayTime = System.currentTimeMillis().milliseconds
         val diff = todayTime - targetTime.milliseconds
         return diff.absoluteValue.inWholeDays.toString()
+    }
+
+    fun startEventsCountdownWork(context: Context){
+        val workManager = WorkManager.getInstance(context)
+//        OneTimeWorkRequestBuilder<UpdateWidgetWorker>()
+//            .setInitialDelay(1.milliseconds)
     }
 }

@@ -3,7 +3,6 @@ package fan.san.eventscountdown.viewmodel
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,8 +13,6 @@ import fan.san.eventscountdown.entity.MessageEvent
 import fan.san.eventscountdown.repository.CountdownRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,19 +24,16 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     var calendarAccounts = mutableStateListOf<CalendarAccountBean>()
-    val allEvents: SnapshotStateList<Events> by lazy {
-        mutableStateListOf()
-    }
+
+    //申请权限的时间，用于触发回调做计算，回调时间 - 申请时间 < 300ms，认为是已经永久拒绝了权限
+    var lastRequestPermissionTime = 0L
+    var isTriggershouldShowRationale = false
 
     private val _messageEvent: Channel<MessageEvent> = Channel()
+
     val messageEvent = _messageEvent.receiveAsFlow()
 
-
-    var allEventsFlow: Flow<List<Events>> = MutableStateFlow(listOf())
-
-    init {
-        getAllEvents()
-    }
+    val allEventsList = mutableStateListOf<Events>()
 
     fun getCalendarAccounts() {
         calendarAccounts.addAll(repository.queryCalendarAccounts())
@@ -66,7 +60,11 @@ class MainViewModel @Inject constructor(
 
     fun getAllEvents() {
         viewModelScope.launch(Dispatchers.IO) {
-            allEventsFlow = repository.getAllEvents()
+            repository.getAllEvents()
+                .collect{
+                    allEventsList.clear()
+                    allEventsList.addAll(it)
+                }
         }
     }
 }

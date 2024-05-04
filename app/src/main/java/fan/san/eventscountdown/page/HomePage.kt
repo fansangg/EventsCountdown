@@ -81,19 +81,11 @@ fun HomePage(navController: NavController) {
 
     val context = LocalContext.current
     val viewModel = hiltViewModel<MainViewModel>()
-
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getAllEvents()
+    }
     val snackbarHostState = remember {
         SnackbarHostState()
-    }
-
-    val messageEvent by viewModel.messageEvent.collectAsState(initial = MessageEvent.None)
-
-    var lastRequestPermissionTime = remember {
-        0L
-    }
-
-    var isTriggershouldShowRationale = remember {
-        false
     }
 
     val alwaysDenial = remember {
@@ -104,12 +96,12 @@ fun HomePage(navController: NavController) {
         mutableStateOf(false)
     }
 
-    val eventsList by viewModel.allEventsFlow.collectAsState(initial = listOf())
+    val messageEvent by viewModel.messageEvent.collectAsState(initial = MessageEvent.None)
 
     val permissionState = rememberPermissionState(permission = Manifest.permission.READ_CALENDAR) {
         if (!it) {
-            if (isTriggershouldShowRationale) alwaysDenial.value = true
-            if (System.currentTimeMillis() - lastRequestPermissionTime < 500)
+            if (viewModel.isTriggershouldShowRationale) alwaysDenial.value = true
+            if (System.currentTimeMillis() - viewModel.lastRequestPermissionTime < 500)
                 alwaysDenial.value = true
         }
     }
@@ -117,7 +109,7 @@ fun HomePage(navController: NavController) {
     LaunchedEffect(key1 = Unit) {
         delay(300)
         permissionState.launchPermissionRequest()
-        lastRequestPermissionTime = System.currentTimeMillis()
+        viewModel.lastRequestPermissionTime = System.currentTimeMillis()
     }
 
     CommonScaffold(
@@ -126,7 +118,7 @@ fun HomePage(navController: NavController) {
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         actionClick = { showImportDialog = true },
         actionIcon = Icons.Default.Add,
-        showAction = eventsList.isNotEmpty()
+        showAction = viewModel.allEventsList.isNotEmpty()
     ) {
         Column(
             modifier = Modifier
@@ -137,12 +129,12 @@ fun HomePage(navController: NavController) {
                 LaunchedEffect(key1 = Unit) {
                     viewModel.getCalendarAccounts()
                 }
-                if (eventsList.isEmpty()) {
+                if (viewModel.allEventsList.isEmpty()) {
                     NoEvents {
                         showImportDialog = true
                     }
                 } else {
-                    EventsList(eventsList)
+                    EventsList(viewModel)
                 }
 
                 if (showImportDialog) {
@@ -157,7 +149,7 @@ fun HomePage(navController: NavController) {
                 }
             } else {
                 if (permissionState.status.shouldShowRationale)
-                    isTriggershouldShowRationale = true
+                    viewModel.isTriggershouldShowRationale = true
 
                 NoPermissionPage(alwaysDiandel = alwaysDenial) {
                     if (alwaysDenial.value) {
@@ -168,7 +160,7 @@ fun HomePage(navController: NavController) {
                         context.startActivity(intent)
                     } else {
                         permissionState.launchPermissionRequest()
-                        lastRequestPermissionTime = System.currentTimeMillis()
+                        viewModel.lastRequestPermissionTime = System.currentTimeMillis()
                     }
                 }
             }
@@ -182,9 +174,7 @@ fun HomePage(navController: NavController) {
                     }
                 }
 
-                MessageEvent.None -> {
-
-                }
+                MessageEvent.None -> {}
             }
 
         }
@@ -304,17 +294,17 @@ private fun NoEvents(importClick: () -> Unit) {
 }
 
 @Composable
-private fun EventsList(eventsList: List<Events>) {
+private fun EventsList(viewModel: MainViewModel) {
     val state = rememberLazyListState()
-    val pastEvents = eventsList.filter {
+    val pastEvents = viewModel.allEventsList.filter {
         System.currentTimeMillis() > it.startDateTime
     }
 
-    val todayEvents = eventsList.filter {
+    val todayEvents = viewModel.allEventsList.filter {
         System.currentTimeMillis().todayZeroTime == it.startDateTime
     }
 
-    val futureEvents = eventsList.filter {
+    val futureEvents = viewModel.allEventsList.filter {
         System.currentTimeMillis() < it.startDateTime
     }
 

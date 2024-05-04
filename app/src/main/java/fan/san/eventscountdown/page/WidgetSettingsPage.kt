@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,9 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import fan.san.eventscountdown.common.CommonScaffold
-import fan.san.eventscountdown.widget.WidgetStyles
 import fan.san.eventscountdown.common.dataStore
 import fan.san.eventscountdown.viewmodel.SettingsViewModel
+import fan.san.eventscountdown.widget.CountdownWidgetStyles
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -39,7 +40,7 @@ fun WidgetSettingsPage(glanceId: Int) {
     }
 
     LaunchedEffect(key1 = Unit) {
-        context.dataStore.data.map { it[WidgetStyles.backgroundAlpha] ?: 1f }
+        context.dataStore.data.map { it[CountdownWidgetStyles.backgroundAlpha] ?: 1f }
             .collect {
                 currentAlpha = it
             }
@@ -61,6 +62,7 @@ fun WidgetSettingsPage(glanceId: Int) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(it)
         ) {
 
             Row(

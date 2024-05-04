@@ -9,8 +9,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import fan.san.eventscountdown.widget.WidgetStyles
 import fan.san.eventscountdown.common.dataStore
+import fan.san.eventscountdown.widget.CountdownWidgetStyles
 import fan.san.eventscountdown.widget.EventsCountdownWidget
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,12 +28,12 @@ class SettingsViewModel @Inject constructor(@ApplicationContext private val cont
         Log.d("fansangg", "updateWidgetAlpha: $newValue")
         viewModelScope.launch {
             context.dataStore.edit {
-                it[WidgetStyles.backgroundAlpha] = newValue
+                it[CountdownWidgetStyles.backgroundAlpha] = newValue
             }
             GlanceAppWidgetManager(context).apply {
                 getGlanceIds(EventsCountdownWidget::class.java).lastOrNull()?.let {
                     updateAppWidgetState(context, it) { prefs ->
-                        prefs[WidgetStyles.backgroundAlpha] = newValue
+                        prefs[CountdownWidgetStyles.backgroundAlpha] = newValue
                     }
                     EventsCountdownWidget().update(context,it)
                 }
