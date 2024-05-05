@@ -12,6 +12,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 object CountdownWidgetStyles {
     val textColor = intPreferencesKey("countdown_textColor")
     val backgroundColor = intPreferencesKey("countdown_backgroundColor")
+    val backgroundColorOptions = stringPreferencesKey("countdown_backgroundColor_options")
     val backgroundAlpha = floatPreferencesKey("countdown_backgroundAlpha")
 }
 

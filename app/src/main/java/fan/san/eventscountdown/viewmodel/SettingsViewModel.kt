@@ -2,6 +2,8 @@ package fan.san.eventscountdown.viewmodel
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.preferences.core.edit
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.updateAppWidgetState
@@ -14,6 +16,7 @@ import fan.san.eventscountdown.widget.CountdownWidgetStyles
 import fan.san.eventscountdown.widget.EventsCountdownWidget
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 /**
  *@author  范三
@@ -21,21 +24,27 @@ import javax.inject.Inject
  */
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor(@ApplicationContext private val context: Context) : ViewModel() {
+class SettingsViewModel @Inject constructor(@ApplicationContext private val context: Context) :
+    ViewModel() {
 
 
-    fun updateWidgetAlpha(newValue: Float) {
+    fun updateWidgetAlpha(color: String, newValue: Float) {
+        val newColor = if (color == "白色")
+            Color(253, 253, 253, alpha = (newValue * 255).roundToInt())
+        else Color(23, 23, 25, alpha = (newValue * 255).roundToInt())
         Log.d("fansangg", "updateWidgetAlpha: $newValue")
         viewModelScope.launch {
             context.dataStore.edit {
+                it[CountdownWidgetStyles.backgroundColor] = newColor.toArgb()
                 it[CountdownWidgetStyles.backgroundAlpha] = newValue
+                it[CountdownWidgetStyles.backgroundColorOptions] = color
             }
             GlanceAppWidgetManager(context).apply {
                 getGlanceIds(EventsCountdownWidget::class.java).lastOrNull()?.let {
                     updateAppWidgetState(context, it) { prefs ->
-                        prefs[CountdownWidgetStyles.backgroundAlpha] = newValue
+                        prefs[CountdownWidgetStyles.backgroundColor] = newColor.toArgb()
                     }
-                    EventsCountdownWidget().update(context,it)
+                    EventsCountdownWidget().update(context, it)
                 }
             }
 
