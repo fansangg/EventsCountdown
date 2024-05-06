@@ -94,4 +94,5 @@ dependencies {
     implementation(libs.lottie.compose)
 //    implementation(libs.androidx.work)
     implementation(libs.androidx.work.ktx)
+    implementation(libs.moshi)
 }

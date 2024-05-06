@@ -1,9 +1,10 @@
 package fan.san.eventscountdown.widget
 
 import android.content.Context
-import android.text.format.DateFormat
 import android.util.Log
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
@@ -27,6 +28,7 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import dagger.hilt.android.EntryPointAccessors
+import fan.san.eventscountdown.entity.TestLogBean
 import fan.san.eventscountdown.utils.CommonUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -44,14 +46,18 @@ class EventsCountdownWidget : GlanceAppWidget() {
         val nextEvents = withContext(Dispatchers.IO) {
             repository.getNextEvents()
         }
-
+        CommonUtil.saveLog(context, TestLogBean(System.currentTimeMillis(),"provideGlance#1"))
         provideContent {
             val prefs = currentState<Preferences>()
+            val scope = rememberCoroutineScope()
             val backgroundColorArgb =
                 prefs[CountdownWidgetStyles.backgroundColor] ?: Color.Black.toArgb()
             val backgroundColor = Color(backgroundColorArgb)
             val defaultTextStyle =
                 TextStyle(color = ColorProvider(if (isLightColor(backgroundColor)) Color.Black else Color.White))
+            LaunchedEffect(key1 = null) {
+                CommonUtil.saveLog(context, TestLogBean(System.currentTimeMillis(),"provideGlance#2"))
+            }
             SideEffect {
                 UpdateWidgetWorker.enqueuePeriodWork(context, id)
                 Log.d("fansangg", "EventsCountdownWidget#provideGlance: enqueueUniqueWork")

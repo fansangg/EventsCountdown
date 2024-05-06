@@ -27,5 +27,9 @@ fun NavHostPage(startDestination:String){
             val glanceId = it.arguments?.getInt(Pages.Setting.glanceId)?:AppWidgetManager.INVALID_APPWIDGET_ID
             WidgetSettingsPage(glanceId)
         }
+
+        composable(Pages.Log.route){
+            LogPage()
+        }
     }
 }

@@ -71,6 +71,7 @@ import fan.san.eventscountdown.common.todayZeroTime
 import fan.san.eventscountdown.db.Events
 import fan.san.eventscountdown.entity.CalendarAccountBean
 import fan.san.eventscountdown.entity.MessageEvent
+import fan.san.eventscountdown.navigation.Pages
 import fan.san.eventscountdown.utils.CommonUtil
 import fan.san.eventscountdown.viewmodel.MainViewModel
 import kotlinx.coroutines.delay
@@ -114,7 +115,10 @@ fun HomePage(navController: NavController) {
 
     CommonScaffold(
         title = "日历事件",
-        showBack = false,
+        showBack = true,
+        backClick = {
+            navController.navigate(Pages.Log.route)
+        },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         actionClick = { showImportDialog = true },
         actionIcon = Icons.Default.Add,

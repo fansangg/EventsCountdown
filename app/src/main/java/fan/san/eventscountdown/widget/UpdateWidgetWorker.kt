@@ -14,6 +14,8 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import fan.san.eventscountdown.common.todayZeroTime
+import fan.san.eventscountdown.entity.TestLogBean
+import fan.san.eventscountdown.utils.CommonUtil
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -66,6 +68,7 @@ class UpdateWidgetWorker(
 
     override suspend fun doWork(): Result {
         val isOneTime = inputData.getBoolean("isOneTime", false)
+        CommonUtil.saveLog(context, TestLogBean(System.currentTimeMillis(),"doWork --- isOneTime == $isOneTime"))
         Log.d("fansangg", "UpdateWidgetWorker#doWork:isOneTime == $isOneTime")
         if (isOneTime) {
             val delayTime = inputData.getLong("delayTime", 0L)
