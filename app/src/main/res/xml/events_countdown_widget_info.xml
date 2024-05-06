@@ -10,3 +10,4 @@
     android:widgetFeatures="reconfigurable"
     >
 </appwidget-provider>
+    <!--android:updatePeriodMillis="86400000"-->

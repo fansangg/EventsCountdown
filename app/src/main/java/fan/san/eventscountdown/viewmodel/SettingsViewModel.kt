@@ -2,6 +2,7 @@ package fan.san.eventscountdown.viewmodel
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.preferences.core.edit
@@ -27,11 +28,12 @@ import kotlin.math.roundToInt
 class SettingsViewModel @Inject constructor(@ApplicationContext private val context: Context) :
     ViewModel() {
 
+        val currentColor = mutableStateOf(Color(253, 253, 253))
 
     fun updateWidgetAlpha(color: String, newValue: Float) {
         val newColor = if (color == "白色")
             Color(253, 253, 253, alpha = (newValue * 255).roundToInt())
-        else Color(23, 23, 25, alpha = (newValue * 255).roundToInt())
+        else Color(37, 37, 39, alpha = (newValue * 255).roundToInt())
         Log.d("fansangg", "updateWidgetAlpha: $newValue")
         viewModelScope.launch {
             context.dataStore.edit {
