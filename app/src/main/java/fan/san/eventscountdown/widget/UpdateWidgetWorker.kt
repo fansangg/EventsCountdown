@@ -38,7 +38,7 @@ class UpdateWidgetWorker(
                     ExistingPeriodicWorkPolicy.KEEP,
                     PeriodicWorkRequest.Builder(
                         UpdateWidgetWorker::class.java,
-                        20.minutes.toJavaDuration()
+                        3.hours.toJavaDuration()
                     ).addTag(id.toString()).build()
                 )
 
