@@ -84,7 +84,7 @@ class EventsCountdownWidget : GlanceAppWidget() {
                                 text = nextEvents.first().title,
                                 style = defaultTextStyle.copy(
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp
+                                    fontSize = 18.sp
                                 )
                             )
 
@@ -93,7 +93,7 @@ class EventsCountdownWidget : GlanceAppWidget() {
                                 contentAlignment = Alignment.BottomEnd
                             ) {
                                 Row {
-                                    Text(text = "剩余 ", style = defaultTextStyle)
+                                    Text(text = "剩余 ", style = defaultTextStyle.copy(fontSize = 16.sp))
                                     Text(
                                         text = CommonUtil.getDaysDiff(nextEvents.first().startDateTime),
                                         style = defaultTextStyle.copy(
@@ -101,7 +101,7 @@ class EventsCountdownWidget : GlanceAppWidget() {
                                             fontWeight = FontWeight.Bold
                                         )
                                     )
-                                    Text(text = " 天", style = defaultTextStyle)
+                                    Text(text = " 天", style = defaultTextStyle.copy(fontSize = 16.sp))
                                 }
                             }
                         }

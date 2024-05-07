@@ -45,7 +45,6 @@ import fan.san.eventscountdown.common.SpacerW
 import fan.san.eventscountdown.common.dataStore
 import fan.san.eventscountdown.viewmodel.SettingsViewModel
 import fan.san.eventscountdown.widget.CountdownWidgetStyles
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -69,7 +68,7 @@ fun WidgetSettingsPage(glanceId: Int) {
         context.dataStore.data.collect {
             currentAlpha = it[CountdownWidgetStyles.backgroundAlpha] ?: 1f
             onOptionSelected(it[CountdownWidgetStyles.backgroundColorOptions] ?: "白色")
-            viewModel.changeColor(selectedOption)
+            viewModel.changeColor(it[CountdownWidgetStyles.backgroundColorOptions] ?: "白色")
         }
     }
     CommonScaffold(
@@ -90,6 +89,7 @@ fun WidgetSettingsPage(glanceId: Int) {
                 .padding(it)
         ) {
 
+            SpacerH(height = 14.dp)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -97,7 +97,8 @@ fun WidgetSettingsPage(glanceId: Int) {
                     .background(
                         MaterialTheme.colorScheme.surfaceContainerHigh,
                         shape = RoundedCornerShape(12.dp)
-                    ),
+                    )
+                    .padding(vertical = 10.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -105,9 +106,13 @@ fun WidgetSettingsPage(glanceId: Int) {
                     modifier = Modifier
                         .size(
                             width = Dp(width / 5f * 3),
-                            height = Dp(height / 5f)
+                            height = Dp(height / 7f)
                         )
-                        .padding(top = 20.dp)
+                        .background(
+                            viewModel.currentColor.copy(alpha = currentAlpha),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .padding(horizontal = 14.dp, vertical = 10.dp)
                 ) {
                     Column(modifier = Modifier.fillMaxSize()) {
                         Text(
@@ -121,20 +126,23 @@ fun WidgetSettingsPage(glanceId: Int) {
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.BottomEnd
                         ) {
-                            androidx.glance.layout.Row {
+                            Row {
                                 Text(
                                     text = "剩余 ",
+                                    modifier = Modifier.alignByBaseline(),
                                     fontSize = 16.sp,
                                     color = viewModel.isLightColor()
                                 )
                                 Text(
                                     text = "100",
+                                    modifier = Modifier.alignByBaseline(),
                                     fontSize = 38.sp,
                                     color = viewModel.isLightColor(),
                                     fontWeight = androidx.compose.ui.text.font.FontWeight.W700
                                 )
                                 Text(
                                     text = " 天",
+                                    modifier = Modifier.alignByBaseline(),
                                     fontSize = 16.sp,
                                     color = viewModel.isLightColor()
                                 )
