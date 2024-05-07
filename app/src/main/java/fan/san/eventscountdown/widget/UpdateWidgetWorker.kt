@@ -13,7 +13,9 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import dagger.hilt.android.EntryPointAccessors
 import fan.san.eventscountdown.common.todayZeroTime
+import fan.san.eventscountdown.db.Logs
 import fan.san.eventscountdown.entity.TestLogBean
 import fan.san.eventscountdown.utils.CommonUtil
 import kotlinx.coroutines.delay
@@ -36,7 +38,7 @@ class UpdateWidgetWorker(
                     ExistingPeriodicWorkPolicy.KEEP,
                     PeriodicWorkRequest.Builder(
                         UpdateWidgetWorker::class.java,
-                        2.hours.toJavaDuration()
+                        20.minutes.toJavaDuration()
                     ).addTag(id.toString()).build()
                 )
 
@@ -68,7 +70,8 @@ class UpdateWidgetWorker(
 
     override suspend fun doWork(): Result {
         val isOneTime = inputData.getBoolean("isOneTime", false)
-        CommonUtil.saveLog(context, TestLogBean(System.currentTimeMillis(),"doWork --- isOneTime == $isOneTime"))
+        val repository = EntryPointAccessors.fromApplication<WidgetEntryPoint>(context).getCountdownRepository()
+        repository.insertLogs(Logs.create("doWrok -- isOneTime == $isOneTime"))
         Log.d("fansangg", "UpdateWidgetWorker#doWork:isOneTime == $isOneTime")
         if (isOneTime) {
             val delayTime = inputData.getLong("delayTime", 0L)

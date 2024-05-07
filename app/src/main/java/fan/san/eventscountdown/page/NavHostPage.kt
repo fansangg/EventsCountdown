@@ -29,7 +29,7 @@ fun NavHostPage(startDestination:String){
         }
 
         composable(Pages.Log.route){
-            LogPage()
+            LogPage(navController)
         }
     }
 }

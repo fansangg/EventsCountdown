@@ -1,7 +1,6 @@
 package fan.san.eventscountdown.page
 
 import android.app.Activity
-import android.app.WallpaperManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,6 +45,7 @@ import fan.san.eventscountdown.common.SpacerW
 import fan.san.eventscountdown.common.dataStore
 import fan.san.eventscountdown.viewmodel.SettingsViewModel
 import fan.san.eventscountdown.widget.CountdownWidgetStyles
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -58,15 +58,18 @@ fun WidgetSettingsPage(glanceId: Int) {
         mutableFloatStateOf(1f)
     }
 
+
     val width = LocalConfiguration.current.screenWidthDp
     val height = LocalConfiguration.current.screenHeightDp
     val viewModel = hiltViewModel<SettingsViewModel>()
     val radioOptions = listOf("白色", "黑色")
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
+
     LaunchedEffect(key1 = Unit) {
-        context.dataStore.data.collect{
-            currentAlpha = it[CountdownWidgetStyles.backgroundAlpha]?:1f
-            onOptionSelected(it[CountdownWidgetStyles.backgroundColorOptions]?:"白色")
+        context.dataStore.data.collect {
+            currentAlpha = it[CountdownWidgetStyles.backgroundAlpha] ?: 1f
+            onOptionSelected(it[CountdownWidgetStyles.backgroundColorOptions] ?: "白色")
+            viewModel.changeColor(selectedOption)
         }
     }
     CommonScaffold(
@@ -77,7 +80,7 @@ fun WidgetSettingsPage(glanceId: Int) {
         actionClick = {
             (context as Activity).setResult(Activity.RESULT_OK)
             scope.launch {
-                viewModel.updateWidgetAlpha(selectedOption,currentAlpha)
+                viewModel.updateWidgetAlpha(selectedOption, currentAlpha)
                 context.finish()
             }
         }) {
@@ -94,13 +97,52 @@ fun WidgetSettingsPage(glanceId: Int) {
                     .background(
                         MaterialTheme.colorScheme.surfaceContainerHigh,
                         shape = RoundedCornerShape(12.dp)
-                    )
-            , verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
-                Box(modifier = Modifier.size(width = Dp(width / 5f * 3),height = Dp(height / 5f))){
+                    ),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(
+                            width = Dp(width / 5f * 3),
+                            height = Dp(height / 5f)
+                        )
+                        .padding(top = 20.dp)
+                ) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        Text(
+                            text = "春节",
+                            fontSize = 18.sp,
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.W600,
+                            color = viewModel.isLightColor()
+                        )
 
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.BottomEnd
+                        ) {
+                            androidx.glance.layout.Row {
+                                Text(
+                                    text = "剩余 ",
+                                    fontSize = 16.sp,
+                                    color = viewModel.isLightColor()
+                                )
+                                Text(
+                                    text = "100",
+                                    fontSize = 38.sp,
+                                    color = viewModel.isLightColor(),
+                                    fontWeight = androidx.compose.ui.text.font.FontWeight.W700
+                                )
+                                Text(
+                                    text = " 天",
+                                    fontSize = 16.sp,
+                                    color = viewModel.isLightColor()
+                                )
+                            }
+                        }
+                    }
                 }
             }
-
             SpacerH(height = 12.dp)
             Text(text = "背景颜色", fontSize = 14.sp, modifier = Modifier.padding(start = 14.dp))
             SpacerH(height = 8.dp)
@@ -121,7 +163,10 @@ fun WidgetSettingsPage(glanceId: Int) {
                             .height(50.dp)
                             .selectable(
                                 text == selectedOption,
-                                onClick = { onOptionSelected(text) },
+                                onClick = {
+                                    onOptionSelected(text)
+                                    viewModel.changeColor(text)
+                                },
                                 role = Role.RadioButton
                             ), verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -155,11 +200,13 @@ fun WidgetSettingsPage(glanceId: Int) {
                         modifier = Modifier.weight(0.2f),
                         textAlign = TextAlign.Center
                     )
-                    Slider(value = currentAlpha, onValueChange = { alpha ->
-                        currentAlpha = alpha
-                    }, steps = 9, valueRange = 0f..1f, modifier = Modifier
-                        .weight(1f)
-                        .height(40.dp))
+                    Slider(
+                        value = currentAlpha, onValueChange = { alpha ->
+                            currentAlpha = alpha
+                        }, steps = 9, valueRange = 0f..1f, modifier = Modifier
+                            .weight(1f)
+                            .height(40.dp)
+                    )
                 }
             }
         }

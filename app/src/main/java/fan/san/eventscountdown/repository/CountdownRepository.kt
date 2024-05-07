@@ -6,6 +6,7 @@ import android.provider.CalendarContract
 import dagger.hilt.android.qualifiers.ApplicationContext
 import fan.san.eventscountdown.common.todayZeroTime
 import fan.san.eventscountdown.db.Events
+import fan.san.eventscountdown.db.Logs
 import fan.san.eventscountdown.entity.CalendarAccountBean
 import fan.san.eventscountdown.utils.CommonUtil
 import kotlinx.coroutines.flow.Flow
@@ -16,15 +17,24 @@ import javax.inject.Singleton
 @Singleton
 class CountdownRepository @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val eventsDao: Events.EventsDao
+    private val eventsDao: Events.EventsDao,
+    private val logsDao: Logs.LogsDao
 ) {
 
     fun getAllEvents(): Flow<List<Events>> = eventsDao.query()
-    suspend fun insert(events: Events) = eventsDao.insert(events)
-    suspend fun insert(events: List<Events>) = eventsDao.insert(events)
+    suspend fun insertEvents(events: Events) = eventsDao.insert(events)
+    suspend fun insertEvents(events: List<Events>) = eventsDao.insert(events)
     suspend fun delete(events: Events) = eventsDao.delete(events)
     suspend fun update(isShow: Boolean, id: Long) = eventsDao.update(if (isShow) 1 else 0, id)
     fun getNextEvents() = eventsDao.getNextEvents(System.currentTimeMillis().todayZeroTime)
+
+    fun deleteBefore7() = logsDao.deleteBefore7()
+
+    fun insertLogs(log:Logs) = logsDao.insert(log)
+
+    fun queryLogsByDate(date:String):Flow<List<Logs>> = logsDao.queryByDate(date)
+
+    fun queryLogDates() : List<String> = logsDao.queryDates()
 
     fun queryCalendarAccounts(): List<CalendarAccountBean> {
         val list = mutableListOf<CalendarAccountBean>()

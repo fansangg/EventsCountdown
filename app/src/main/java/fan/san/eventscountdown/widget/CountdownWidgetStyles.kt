@@ -15,8 +15,3 @@ object CountdownWidgetStyles {
     val backgroundColorOptions = stringPreferencesKey("countdown_backgroundColor_options")
     val backgroundAlpha = floatPreferencesKey("countdown_backgroundAlpha")
 }
-
-object CountdownWidgetInfos{
-    val title = stringPreferencesKey("countdown_title")
-    val days = stringPreferencesKey("countdown_days")
-}

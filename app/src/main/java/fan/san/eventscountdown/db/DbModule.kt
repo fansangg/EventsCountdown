@@ -22,4 +22,8 @@ class DbModule {
     @Singleton
     @Provides
     fun provideEventDao(db:AppDb):Events.EventsDao = db.eventsDao()
+
+    @Singleton
+    @Provides
+    fun provideLogsDao(db: AppDb):Logs.LogsDao = db.logsDao()
 }

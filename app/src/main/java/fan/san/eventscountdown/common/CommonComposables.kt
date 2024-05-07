@@ -1,5 +1,7 @@
 package fan.san.eventscountdown.common
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material.icons.Icons
@@ -22,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -41,10 +44,24 @@ fun CommonTopAppBar(
     actionIcon: ImageVector? = null,
     actionClick: (() -> Unit)? = null,
     backClick: (() -> Unit)? = null,
-    behavior: TopAppBarScrollBehavior? = null
+    behavior: TopAppBarScrollBehavior? = null,
+    titleClick: (() -> Unit)? = null,
+    titleDoublePress: (() -> Unit)? = null
 ) {
     CenterAlignedTopAppBar(
-        title = { Text(text = title, fontSize = 20.sp) },
+        title = {
+            Text(
+                text = title,
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .clickable(
+                        enabled = titleClick != null,
+                        onClick = titleClick ?: {})
+                    .pointerInput(Unit) {
+                        detectTapGestures(onDoubleTap = { titleDoublePress?.invoke() })
+                    }
+            )
+        },
         navigationIcon = {
             if (showBack)
                 IconButton(onClick = { backClick?.invoke() }) {
@@ -80,6 +97,8 @@ fun CommonScaffold(
     actionIcon: ImageVector? = null,
     actionClick: (() -> Unit)? = null,
     backClick: (() -> Unit)? = null,
+    titleClick: (() -> Unit)? = null,
+    titleDoublePress: (() -> Unit)? = null,
     behavior: TopAppBarScrollBehavior? = null,
     bottomBar: @Composable () -> Unit = {},
     snackbarHost: @Composable () -> Unit = {},
@@ -92,7 +111,19 @@ fun CommonScaffold(
 ) {
     Scaffold(
         modifier = modifier,
-        topBar = { CommonTopAppBar(title, showBack, showAction, actionIcon, actionClick, backClick, behavior) },
+        topBar = {
+            CommonTopAppBar(
+                title,
+                showBack,
+                showAction,
+                actionIcon,
+                actionClick,
+                backClick,
+                behavior,
+                titleClick,
+                titleDoublePress
+            )
+        },
         bottomBar = bottomBar,
         snackbarHost = snackbarHost,
         floatingActionButton = floatingActionButton,
@@ -106,16 +137,32 @@ fun CommonScaffold(
 
 
 @Composable
-fun DialogWrapper(dismiss:(() -> Unit)? = null,dismissOnClickOutside:Boolean = false, dismissOnBackPress:Boolean = true, usePlatformDefaultWidth:Boolean = false,content:@Composable () -> Unit){
-    Dialog(onDismissRequest = { dismiss?.invoke() }, properties = DialogProperties(dismissOnClickOutside = dismissOnClickOutside, dismissOnBackPress = dismissOnBackPress, usePlatformDefaultWidth = usePlatformDefaultWidth)) {
+fun DialogWrapper(
+    dismiss: (() -> Unit)? = null,
+    dismissOnClickOutside: Boolean = false,
+    dismissOnBackPress: Boolean = true,
+    usePlatformDefaultWidth: Boolean = false,
+    content: @Composable () -> Unit
+) {
+    Dialog(
+        onDismissRequest = { dismiss?.invoke() },
+        properties = DialogProperties(
+            dismissOnClickOutside = dismissOnClickOutside,
+            dismissOnBackPress = dismissOnBackPress,
+            usePlatformDefaultWidth = usePlatformDefaultWidth
+        )
+    ) {
         content()
     }
 }
 
 @Composable
-fun EmptyLottie(modifier: Modifier){
+fun EmptyLottie(modifier: Modifier) {
     val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.empty))
-    val progress by animateLottieCompositionAsState(composition, iterations =  LottieConstants.IterateForever)
+    val progress by animateLottieCompositionAsState(
+        composition,
+        iterations = LottieConstants.IterateForever
+    )
     LottieAnimation(
         composition = composition,
         progress = { progress },

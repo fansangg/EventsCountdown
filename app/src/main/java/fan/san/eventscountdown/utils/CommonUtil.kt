@@ -39,21 +39,4 @@ object CommonUtil {
 //        OneTimeWorkRequestBuilder<UpdateWidgetWorker>()
 //            .setInitialDelay(1.milliseconds)
     }
-
-    suspend fun saveLog(context: Context, testLogBean: TestLogBean){
-       val logs = stringPreferencesKey("logs")
-        /*  val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
-         val parameterizedType  = Types.newParameterizedType(List::class.java,TestLogBean::class.java)
-         val adapter = moshi.adapter<List<TestLogBean>>(parameterizedType)*/
-        var savedData = context.dataStore.data.map {
-            it[logs]?:""
-        }.first()
-        /*val savedList = adapter.fromJson(savedData)?.toMutableList()?: mutableListOf()
-        savedList.add(testLogBean)
-        val newData = adapter.toJson(savedList)*/
-        savedData += testLogBean.toString()
-        context.dataStore.edit {
-            it[logs] = savedData
-        }
-    }
 }

@@ -115,14 +115,14 @@ fun HomePage(navController: NavController) {
 
     CommonScaffold(
         title = "日历事件",
-        showBack = true,
-        backClick = {
+        showBack = false,
+        titleDoublePress = {
             navController.navigate(Pages.Log.route)
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         actionClick = { showImportDialog = true },
         actionIcon = Icons.Default.Add,
-        showAction = viewModel.allEventsList.isNotEmpty()
+        showAction = viewModel.allEventsList.isNotEmpty(),
     ) {
         Column(
             modifier = Modifier

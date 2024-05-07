@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
@@ -28,7 +27,7 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import dagger.hilt.android.EntryPointAccessors
-import fan.san.eventscountdown.entity.TestLogBean
+import fan.san.eventscountdown.db.Logs
 import fan.san.eventscountdown.utils.CommonUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -44,19 +43,21 @@ class EventsCountdownWidget : GlanceAppWidget() {
         val repository =
             EntryPointAccessors.fromApplication<WidgetEntryPoint>(context).getCountdownRepository()
         val nextEvents = withContext(Dispatchers.IO) {
+            repository.insertLogs(Logs.create("provideGlance#1"))
             repository.getNextEvents()
         }
-        CommonUtil.saveLog(context, TestLogBean(System.currentTimeMillis(),"provideGlance#1"))
+        Log.d("fansangg", "EventsCountdownWidget#provideGlance:#1")
         provideContent {
             val prefs = currentState<Preferences>()
-            val scope = rememberCoroutineScope()
             val backgroundColorArgb =
                 prefs[CountdownWidgetStyles.backgroundColor] ?: Color.Black.toArgb()
             val backgroundColor = Color(backgroundColorArgb)
             val defaultTextStyle =
                 TextStyle(color = ColorProvider(if (isLightColor(backgroundColor)) Color.Black else Color.White))
             LaunchedEffect(key1 = null) {
-                CommonUtil.saveLog(context, TestLogBean(System.currentTimeMillis(),"provideGlance#2"))
+                withContext(Dispatchers.IO) {
+                    repository.insertLogs(Logs.create("provideGlance#2"))
+                }
             }
             SideEffect {
                 UpdateWidgetWorker.enqueuePeriodWork(context, id)

@@ -44,7 +44,7 @@ class MainViewModel @Inject constructor(
     fun getCalendarEvents(accountId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.getCalendarEvents(accountId)
-            val count = repository.insert(result)
+            val count = repository.insertEvents(result)
             val ignoreCount = count.count { it == -1L }
             val sb = StringBuilder()
             sb.append("成功导入${count.size - ignoreCount}个事件")
