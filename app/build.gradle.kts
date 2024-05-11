@@ -30,7 +30,21 @@ android {
                 "proguard-rules.pro"
             )
         }
+
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
+        }
     }
+
+    signingConfigs {
+        getByName("debug"){
+            storeFile = file("./eventscountdown.jks")
+            storePassword = "123456"
+            keyAlias = "key0"
+            keyPassword = "123456"
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
