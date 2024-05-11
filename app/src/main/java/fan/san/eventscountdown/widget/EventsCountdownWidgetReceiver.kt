@@ -32,7 +32,7 @@ class EventsCountdownWidgetReceiver :
         super.onReceive(context, intent)
         val scope = CoroutineScope(Dispatchers.IO)
         scope.launch {
-            repository.insertLogs(Logs.create("onReceive"))
+            repository.insertLogs(Logs.create("onReceive -- "))
             Log.d("fansangg", "EventsCountdownWidgetReceiver#onReceive:")
         }
     }
@@ -45,7 +45,7 @@ class EventsCountdownWidgetReceiver :
         super.onUpdate(context, appWidgetManager, appWidgetIds)
         val scope = CoroutineScope(Dispatchers.IO)
         scope.launch {
-            repository.insertLogs(Logs.create("onUpdate"))
+            repository.insertLogs(Logs.create("onUpdate - appWidgetIds == ${appWidgetIds.joinToString(",")}"))
             Log.d("fansangg", "EventsCountdownWidgetReceiver#onUpdate:")
         }
     }

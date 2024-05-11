@@ -43,10 +43,9 @@ class EventsCountdownWidget : GlanceAppWidget() {
         val repository =
             EntryPointAccessors.fromApplication<WidgetEntryPoint>(context).getCountdownRepository()
         val nextEvents = withContext(Dispatchers.IO) {
-            repository.insertLogs(Logs.create("provideGlance#1"))
+            repository.insertLogs(Logs.create("provideGlance id=$id"))
             repository.getNextEvents()
         }
-        Log.d("fansangg", "EventsCountdownWidget#provideGlance:#1")
         provideContent {
             val prefs = currentState<Preferences>()
             val backgroundColorArgb =
@@ -56,12 +55,14 @@ class EventsCountdownWidget : GlanceAppWidget() {
                 TextStyle(color = ColorProvider(if (isLightColor(backgroundColor)) Color.Black else Color.White))
             LaunchedEffect(key1 = null) {
                 withContext(Dispatchers.IO) {
-                    repository.insertLogs(Logs.create("provideGlance#2"))
+                    repository.insertLogs(Logs.create("""
+                --- 小组件更新 ---
+                ${if (nextEvents.isEmpty()) "无下一个事件" else "下一个事件=${nextEvents.firstOrNull()?.title},剩余=${CommonUtil.getDaysDiff(nextEvents.first().startDateTime)}"}
+            """.trimIndent()))
                 }
             }
             SideEffect {
                 UpdateWidgetWorker.enqueuePeriodWork(context, id)
-                Log.d("fansangg", "EventsCountdownWidget#provideGlance: enqueueUniqueWork")
             }
             GlanceTheme {
                 Box(

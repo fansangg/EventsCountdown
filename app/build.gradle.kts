@@ -20,6 +20,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        val nowTime = System.currentTimeMillis()
+        buildConfigField("Long", "BUILD_TIME", "${nowTime}L")
     }
 
     buildTypes {

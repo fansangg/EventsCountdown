@@ -25,10 +25,10 @@ data class Logs(
         @Query("SELECT * FROM logs WHERE :date = date")
         fun queryByDate(date:String): Flow<List<Logs>>
 
-        @Query("SELECT DISTINCT date FROM logs")
+        @Query("SELECT DISTINCT date FROM logs order by time DESC")
         fun queryDates():List<String>
 
-        @Query("DELETE FROM logs WHERE strftime('%s', 'now') - strftime('%s', time) > 7 * 24 * 60 * 60")
+        @Query("DELETE FROM logs WHERE time < strftime('%s', date('now', '-7 days')) * 1000")
         fun deleteBefore7()
     }
 
