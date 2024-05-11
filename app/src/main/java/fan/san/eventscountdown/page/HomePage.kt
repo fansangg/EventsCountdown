@@ -301,7 +301,7 @@ private fun NoEvents(importClick: () -> Unit) {
 private fun EventsList(viewModel: MainViewModel) {
     val state = rememberLazyListState()
     val pastEvents = viewModel.allEventsList.filter {
-        System.currentTimeMillis() > it.startDateTime
+        System.currentTimeMillis().todayZeroTime > it.startDateTime
     }
 
     val todayEvents = viewModel.allEventsList.filter {
@@ -332,7 +332,7 @@ private fun EventsList(viewModel: MainViewModel) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 8.dp, top = 8.dp)
+                            .padding(start = 8.dp)
                     ) {
                         Text(text = "今天", fontSize = 18.sp)
                     }
