@@ -114,7 +114,7 @@ fun HomePage(navController: NavController) {
     }
 
     CommonScaffold(
-        title = "日历事件",
+        title = "事件列表",
         showBack = false,
         titleDoublePress = {
             navController.navigate(Pages.Log.route)
