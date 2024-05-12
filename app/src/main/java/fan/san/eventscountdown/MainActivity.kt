@@ -20,12 +20,10 @@ class MainActivity : ComponentActivity() {
             AppWidgetManager.INVALID_APPWIDGET_ID
         ) ?: AppWidgetManager.INVALID_APPWIDGET_ID
         val startDestination =
-            if (appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) Pages.Setting.withParam(
-                appWidgetId
-            ) else Pages.Home.route
+            if (appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) Pages.Setting.route else Pages.Home.route
         setContent {
             EventsCountdownTheme {
-                NavHostPage(startDestination)
+                NavHostPage(startDestination,appWidgetId)
             }
         }
     }

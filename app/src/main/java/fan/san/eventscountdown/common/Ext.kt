@@ -1,7 +1,6 @@
 package fan.san.eventscountdown.common
 
 import LunarDateUtil
-import android.content.Context
 import android.icu.util.Calendar
 import android.text.format.DateFormat
 import androidx.compose.foundation.layout.Spacer
@@ -9,18 +8,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 
 /**
  *@author  范三
  *@version 2024/5/2
  */
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "widgetInfos")
+//val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "widgetInfos")
 
 @Composable
 fun Int.SpacerW() {
@@ -43,41 +40,41 @@ fun SpacerH(height: Dp) {
     Spacer(modifier = Modifier.height(height))
 }
 
-inline val Long.todayZeroTime get() = todayZeroTime(this)
-inline val Long.formatMd get() = formatMd(this)
-
-inline val Long.getWeekDay get() = getWeekDay(this)
-
-inline val Long.toLunr get() = toLunar(this)
-
-fun toLunar(time: Long): String {
+inline val Long.todayZeroTime:Long get(){
     val calendar = Calendar.getInstance()
-    calendar.timeInMillis = time
-    val lunar = LunarDateUtil.solar2lunar(
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH) + 1,
-        calendar.get(Calendar.DAY_OF_MONTH)
-    )
-    return "${lunar?.iMonthCn}${lunar?.iDayCn}"
-}
-
-fun getWeekDay(time: Long): String {
-    val calendar = Calendar.getInstance()
-    calendar.timeInMillis = time
-    val weekDay = arrayOf("星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日")
-    return weekDay[calendar.get(Calendar.DAY_OF_WEEK) - 1]
-}
-
-fun formatMd(time: Long): String {
-    return DateFormat.format("M月d日", time).toString()
-}
-
-fun todayZeroTime(time: Long): Long {
-    val calendar = Calendar.getInstance()
-    calendar.timeInMillis = time
+    calendar.timeInMillis = this
     calendar.set(Calendar.HOUR_OF_DAY, 0)
     calendar.set(Calendar.MINUTE, 0)
     calendar.set(Calendar.SECOND, 0)
     calendar.set(Calendar.MILLISECOND, 0)
     return calendar.timeInMillis
 }
+inline val Long.formatMd:String get(){
+    return DateFormat.format("M月d日", this).toString()
+}
+
+inline val Long.getWeekDay:String get(){
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = this
+    val weekDay = arrayOf("星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日")
+    return weekDay[calendar.get(Calendar.DAY_OF_WEEK) - 1]
+}
+
+inline val Long.toLunr:String
+    get(){
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = this
+        val lunar = LunarDateUtil.solar2lunar(
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH) + 1,
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+        return "${lunar?.iMonthCn}${lunar?.iDayCn}"
+    }
+
+inline val Color.dynamicTextColor: Color
+    get() {
+        val luminance =
+            (0.2126 * this.red + 0.7152 * this.green + 0.0722 * this.blue) * this.alpha
+        return if (luminance > 0.4) Color.Black else Color.White
+    }

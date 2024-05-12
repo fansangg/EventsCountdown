@@ -26,4 +26,8 @@ class DbModule {
     @Singleton
     @Provides
     fun provideLogsDao(db: AppDb):Logs.LogsDao = db.logsDao()
+
+    @Singleton
+    @Provides
+    fun provideWidgetInfosDao(db: AppDb):WidgetInfos.WidgetInfosDao = db.widgetInfosDao()
 }

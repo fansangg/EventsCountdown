@@ -11,7 +11,7 @@ import fan.san.eventscountdown.navigation.Pages
 
 
 @Composable
-fun NavHostPage(startDestination:String){
+fun NavHostPage(startDestination:String,appWidgetId:Int){
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = startDestination){
         composable(route = Pages.Home.route){
@@ -21,7 +21,7 @@ fun NavHostPage(startDestination:String){
         composable(Pages.Setting.route, arguments = listOf(
             navArgument(Pages.Setting.glanceId){
                 type = NavType.IntType
-                defaultValue = AppWidgetManager.INVALID_APPWIDGET_ID
+                defaultValue = appWidgetId
             }
         )){
             val glanceId = it.arguments?.getInt(Pages.Setting.glanceId)?:AppWidgetManager.INVALID_APPWIDGET_ID

@@ -2,8 +2,6 @@ package fan.san.eventscountdown.widget
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
@@ -13,6 +11,7 @@ import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.currentState
@@ -20,17 +19,21 @@ import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
+import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import dagger.hilt.android.EntryPointAccessors
+import fan.san.eventscountdown.common.dynamicTextColor
+import fan.san.eventscountdown.common.formatMd
+import fan.san.eventscountdown.common.getWeekDay
 import fan.san.eventscountdown.db.Logs
+import fan.san.eventscountdown.repository.EventsCountdownEntryPoint
 import fan.san.eventscountdown.utils.CommonUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 /**
  *@author  范三
@@ -40,30 +43,19 @@ class EventsCountdownWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
 
-        val repository =
-            EntryPointAccessors.fromApplication<WidgetEntryPoint>(context).getCountdownRepository()
-        val nextEvents = withContext(Dispatchers.IO) {
-            repository.insertLogs(Logs.create("provideGlance id=$id"))
-            repository.getNextEvents()
-        }
+        Log.d("fansangg", "EventsCountdownWidget#provideGlance: glanceId == ${GlanceAppWidgetManager(context).getAppWidgetId(id)}")
+
         provideContent {
             val prefs = currentState<Preferences>()
             val backgroundColorArgb =
-                prefs[CountdownWidgetStyles.backgroundColor] ?: Color.Black.toArgb()
+                prefs[CountdownWidgetStateKeys.backgroundColor] ?: Color.Black.toArgb()
             val backgroundColor = Color(backgroundColorArgb)
             val defaultTextStyle =
-                TextStyle(color = ColorProvider(if (isLightColor(backgroundColor)) Color.Black else Color.White))
-            LaunchedEffect(key1 = null) {
-                withContext(Dispatchers.IO) {
-                    repository.insertLogs(Logs.create("""
-                --- 小组件更新 ---
-                ${if (nextEvents.isEmpty()) "无下一个事件" else "下一个事件=${nextEvents.firstOrNull()?.title},剩余=${CommonUtil.getDaysDiff(nextEvents.first().startDateTime)}"}
-            """.trimIndent()))
-                }
-            }
-            SideEffect {
-                UpdateWidgetWorker.enqueuePeriodWork(context, id)
-            }
+                TextStyle(color = ColorProvider(backgroundColor.dynamicTextColor))
+
+            val title = prefs[CountdownWidgetStateKeys.title]?:""
+            val date = prefs[CountdownWidgetStateKeys.date]?:0L
+
             GlanceTheme {
                 Box(
                     modifier = GlanceModifier.padding(horizontal = 14.dp, vertical = 10.dp)
@@ -72,7 +64,7 @@ class EventsCountdownWidget : GlanceAppWidget() {
                         ), contentAlignment = Alignment.Center
                 ) {
 
-                    if (nextEvents.isEmpty()) {
+                    if (title.isEmpty()) {
                         Text(
                             text = "当前无事件", style = defaultTextStyle.copy(
                                 fontWeight = FontWeight.Bold,
@@ -82,11 +74,18 @@ class EventsCountdownWidget : GlanceAppWidget() {
                     } else
                         Column(modifier = GlanceModifier.fillMaxSize()) {
                             Text(
-                                text = nextEvents.first().title,
+                                text = title,
                                 style = defaultTextStyle.copy(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 18.sp
                                 )
+                            )
+
+                            Spacer(modifier = GlanceModifier.height(2.dp))
+
+                            Text(
+                                text = "${date.formatMd}  ${date.getWeekDay}",
+                                style = defaultTextStyle.copy(fontSize = 16.sp, fontWeight = FontWeight.Medium)
                             )
 
                             Box(
@@ -96,7 +95,7 @@ class EventsCountdownWidget : GlanceAppWidget() {
                                 Row {
                                     Text(text = "剩余 ", style = defaultTextStyle.copy(fontSize = 16.sp))
                                     Text(
-                                        text = CommonUtil.getDaysDiff(nextEvents.first().startDateTime),
+                                        text = CommonUtil.getDaysDiff(date),
                                         style = defaultTextStyle.copy(
                                             fontSize = 38.sp,
                                             fontWeight = FontWeight.Bold
@@ -112,11 +111,6 @@ class EventsCountdownWidget : GlanceAppWidget() {
         }
     }
 
-    private fun isLightColor(color: Color): Boolean {
-        val luminance = (0.2126 * color.red + 0.7152 * color.green + 0.0722 * color.blue)
-        return luminance > 0.5
-    }
-
     override fun onCompositionError(
         context: Context,
         glanceId: GlanceId,
@@ -130,6 +124,13 @@ class EventsCountdownWidget : GlanceAppWidget() {
     override suspend fun onDelete(context: Context, glanceId: GlanceId) {
         super.onDelete(context, glanceId)
         Log.d("fansangg", "EventsCountdownWidget#onDelete: ")
-        UpdateWidgetWorker.cancel(context, glanceId)
+        val repository = EntryPointAccessors.fromApplication<EventsCountdownEntryPoint>(context)
+            .getCountdownRepository()
+        val widgetsInfoRepository =
+            EntryPointAccessors.fromApplication<EventsCountdownEntryPoint>(context)
+                .getWidgetInfosRepository()
+        widgetsInfoRepository.deleteById(GlanceAppWidgetManager(context).getAppWidgetId(glanceId))
+        repository.insertLogs(Logs.create("小组件移除 id == $glanceId"))
+        Log.d("fansangg", "小组件移除 id == $glanceId")
     }
 }
