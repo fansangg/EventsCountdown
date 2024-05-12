@@ -16,6 +16,7 @@ import fan.san.eventscountdown.repository.CountdownRepository
 import fan.san.eventscountdown.repository.WidgetsInfoRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.days
@@ -45,7 +46,9 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val nextEventsList = countdownRepository.getNextEvents()
             if (nextEventsList.isNotEmpty()) {
-                nextEvents = nextEventsList.first()
+                withContext(Dispatchers.Main){
+                    nextEvents = nextEventsList.first()
+                }
             }
         }
     }

@@ -19,9 +19,7 @@ import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
-import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
-import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
@@ -77,15 +75,13 @@ class EventsCountdownWidget : GlanceAppWidget() {
                                 text = title,
                                 style = defaultTextStyle.copy(
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp
+                                    fontSize = 20.sp
                                 )
                             )
 
-                            Spacer(modifier = GlanceModifier.height(2.dp))
-
                             Text(
                                 text = "${date.formatMd}  ${date.getWeekDay}",
-                                style = defaultTextStyle.copy(fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                                style = defaultTextStyle.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold)
                             )
 
                             Box(
@@ -93,11 +89,11 @@ class EventsCountdownWidget : GlanceAppWidget() {
                                 contentAlignment = Alignment.BottomEnd
                             ) {
                                 Row {
-                                    Text(text = "剩余 ", style = defaultTextStyle.copy(fontSize = 16.sp))
+                                    Text(text = "还剩 ", style = defaultTextStyle.copy(fontSize = 16.sp))
                                     Text(
                                         text = CommonUtil.getDaysDiff(date),
                                         style = defaultTextStyle.copy(
-                                            fontSize = 38.sp,
+                                            fontSize = 37.sp,
                                             fontWeight = FontWeight.Bold
                                         )
                                     )
