@@ -66,7 +66,7 @@ import fan.san.eventscountdown.common.SpacerH
 import fan.san.eventscountdown.common.SpacerW
 import fan.san.eventscountdown.common.formatMd
 import fan.san.eventscountdown.common.getWeekDay
-import fan.san.eventscountdown.common.toLunr
+import fan.san.eventscountdown.common.toLunar
 import fan.san.eventscountdown.common.todayZeroTime
 import fan.san.eventscountdown.db.Events
 import fan.san.eventscountdown.entity.CalendarAccountBean
@@ -391,7 +391,7 @@ private fun EventItem(events: Events) {
                     )
                 }
                 2.SpacerH()
-                Text(text = "农历 ${events.startDateTime.toLunr}", fontSize = 15.sp)
+                Text(text = "农历 ${events.startDateTime.toLunar}", fontSize = 15.sp)
 
             }
 

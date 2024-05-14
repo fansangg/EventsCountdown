@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.glance.GlanceId
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.updateAppWidgetState
+import androidx.glance.appwidget.updateAll
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
@@ -35,7 +36,6 @@ class UpdateCountdownWidgetWorker(
             val tomorrow =
                 (System.currentTimeMillis().milliseconds + 1.days).inWholeMilliseconds.todayZeroTime
             val delay = tomorrow - System.currentTimeMillis()
-            Log.d("fansangg", "UpdateWidgetWorker#enqueuePeriodWork: tomorrow == $tomorrow")
             Log.d(
                 "fansangg",
                 "UpdateWidgetWorker#enqueuePeriodWork: delay == ${
@@ -109,17 +109,16 @@ class UpdateCountdownWidgetWorker(
         }
 
         if (nextEvents.isNotEmpty()) {
-            GlanceAppWidgetManager(context)
-                .apply {
-                    getGlanceIdBy(inputData.getInt("id", 0)).let {
-                        updateAppWidgetState(context, it) { prefs ->
-                            prefs[CountdownWidgetStateKeys.title] = nextEvents.first().title
-                            prefs[CountdownWidgetStateKeys.date] = nextEvents.first().startDateTime
-                        }
-
-                        EventsCountdownWidget().update(context, it)
+            GlanceAppWidgetManager(context).apply {
+                getGlanceIds(EventsCountdownWidget::class.java).forEach { glanceId ->
+                    updateAppWidgetState(context, glanceId) { prefs ->
+                        prefs[CountdownWidgetStateKeys.title] = nextEvents.first().title
+                        prefs[CountdownWidgetStateKeys.date] = nextEvents.first().startDateTime
                     }
                 }
+
+                EventsCountdownWidget().updateAll(context)
+            }
         }
 
         Log.d("fansangg", "UpdateWidgetWorker#doWork")

@@ -28,12 +28,16 @@ class EventsCountdownWidgetReceiver :
 
     override val glanceAppWidget: GlanceAppWidget = EventsCountdownWidget()
 
+
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        val scope = CoroutineScope(Dispatchers.IO)
-        scope.launch {
-            Log.d("fansangg", "EventsCountdownWidgetReceiver#onReceive:")
-            repository.insertLogs(Logs.create("onReceive -- "))
+        if (intent.action == AppWidgetManager.ACTION_APPWIDGET_UPDATE){
+            Log.d("fansangg", "EventsCountdownWidgetReceiver#onReceive: ACTION_APPWIDGET_UPDATE")
+            val scope = CoroutineScope(Dispatchers.IO)
+            scope.launch {
+                Log.d("fansangg", "EventsCountdownWidgetReceiver#onReceive:")
+                repository.insertLogs(Logs.create("onReceive -- "))
+            }
         }
     }
 

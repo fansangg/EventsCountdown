@@ -10,6 +10,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import fan.san.eventscountdown.common.defaultLightColor
+import fan.san.eventscountdown.common.defaultNightColor
 import fan.san.eventscountdown.db.Events
 import fan.san.eventscountdown.db.WidgetInfos
 import fan.san.eventscountdown.repository.CountdownRepository
@@ -57,6 +59,7 @@ class SettingsViewModel @Inject constructor(
     var currentColor by mutableStateOf(Color(253, 253, 253))
     var currentAlpha by mutableFloatStateOf(1f)
     var selectedOption by mutableStateOf(radioOptions[0])
+    var followSystem by mutableStateOf(false)
 
     fun getWidgetInfos(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -65,20 +68,26 @@ class SettingsViewModel @Inject constructor(
                 currentColor = ret.first().color
                 currentAlpha = currentColor.alpha
                 selectedOption = ret.first().colorOption
+                followSystem = ret.first().followSystem
             }
         }
     }
 
-    fun changeColor() {
-        currentColor = if (selectedOption == "白色") {
-            Color(253, 253, 253, alpha = (currentAlpha * 255).roundToInt())
-        } else Color(37, 37, 39, alpha = (currentAlpha * 255).roundToInt())
+    fun changeColor(isDark: Boolean) {
+        currentColor = if (followSystem){
+            if (isDark.not()) {
+                defaultLightColor.copy(alpha = currentAlpha)
+            } else defaultNightColor.copy(alpha = currentAlpha)
+        }else{
+            if (selectedOption == "白色") {
+                defaultLightColor.copy(alpha = currentAlpha)
+            } else defaultNightColor.copy(alpha = currentAlpha)
+        }
     }
-
 
     fun updateWidgetInfos(glaceId: Int) {
 
-        val widgetInfos = WidgetInfos(glaceId, color = currentColor, selectedOption)
+        val widgetInfos = WidgetInfos(glaceId, color = currentColor, selectedOption, followSystem = followSystem)
         viewModelScope.launch(Dispatchers.IO) {
             widgetsInfoRepository.insert(widgetInfos)
             widgetsInfoRepository.updateWidgetInfosState(widgetInfos, nextEvents)

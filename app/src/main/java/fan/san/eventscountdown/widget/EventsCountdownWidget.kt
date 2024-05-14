@@ -26,6 +26,7 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import dagger.hilt.android.EntryPointAccessors
+import fan.san.eventscountdown.common.defaultLightColor
 import fan.san.eventscountdown.common.dynamicTextColor
 import fan.san.eventscountdown.common.formatMd
 import fan.san.eventscountdown.common.getWeekDay
@@ -46,7 +47,7 @@ class EventsCountdownWidget : GlanceAppWidget() {
         provideContent {
             val prefs = currentState<Preferences>()
             val backgroundColorArgb =
-                prefs[CountdownWidgetStateKeys.backgroundColor] ?: Color.Black.toArgb()
+                prefs[CountdownWidgetStateKeys.backgroundColor] ?: defaultLightColor.toArgb()
             val backgroundColor = Color(backgroundColorArgb)
             val defaultTextStyle =
                 TextStyle(color = ColorProvider(backgroundColor.dynamicTextColor))

@@ -60,7 +60,7 @@ inline val Long.getWeekDay:String get(){
     return weekDay[calendar.get(Calendar.DAY_OF_WEEK) - 1]
 }
 
-inline val Long.toLunr:String
+inline val Long.toLunar:String
     get(){
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = this
@@ -77,4 +77,14 @@ inline val Color.dynamicTextColor: Color
         val luminance =
             (0.2126 * this.red + 0.7152 * this.green + 0.0722 * this.blue) * this.alpha
         return if (luminance > 0.4) Color.Black else Color.White
+    }
+
+inline val defaultLightColor:Color
+    get() {
+        return Color(253, 253, 253)
+    }
+
+inline val defaultNightColor:Color
+    get() {
+        return Color(37, 37, 39)
     }

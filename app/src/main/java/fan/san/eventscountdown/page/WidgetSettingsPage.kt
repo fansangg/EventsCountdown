@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,12 +25,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -149,6 +152,10 @@ fun WidgetSettingsPage(glanceId: Int) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AttributeSetting(viewModel: SettingsViewModel) {
+    val isDark = isSystemInDarkTheme()
+    LaunchedEffect(key1 = isDark) {
+        viewModel.changeColor(isDark)
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -168,19 +175,21 @@ private fun AttributeSetting(viewModel: SettingsViewModel) {
                         text == viewModel.selectedOption,
                         onClick = {
                             viewModel.selectedOption = text
-                            viewModel.changeColor()
+                            viewModel.changeColor(isDark)
                         },
-                        role = Role.RadioButton
+                        role = Role.RadioButton,
+                        enabled = viewModel.followSystem.not()
                     ), verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
                     selected = text == viewModel.selectedOption,
-                    onClick = null
+                    onClick = null,
+                    enabled = viewModel.followSystem.not()
                 )
 
                 SpacerW(12.dp)
 
-                Text(text = text, fontSize = 16.sp)
+                Text(text = text, fontSize = 16.sp, modifier = Modifier.alpha(if (viewModel.followSystem) .6f else 1f))
             }
 
             if (index != viewModel.radioOptions.size - 1) {
@@ -211,13 +220,31 @@ private fun AttributeSetting(viewModel: SettingsViewModel) {
             Slider(
                 value = viewModel.currentAlpha, onValueChange = { alpha ->
                     viewModel.currentAlpha = alpha
-                    viewModel.changeColor()
+                    viewModel.changeColor(isDark)
                 }, steps = 9, valueRange = 0f..1f, modifier = Modifier
                     .weight(1f)
                     .height(40.dp), track = {
                         SliderDefaults.Track(sliderState = it, modifier = Modifier.scale(scaleX = 1f, scaleY = 1.2f))
                 }
             )
+        }
+
+        SpacerH(height = 12.dp)
+
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .background(
+                MaterialTheme.colorScheme.surfaceContainerHigh,
+                shape = RoundedCornerShape(12.dp)
+            ), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically){
+
+            Text(text = "跟随系统", fontSize = 16.sp)
+
+            Switch(checked = viewModel.followSystem, onCheckedChange = {
+                viewModel.followSystem = it
+                viewModel.changeColor(isDark)
+            })
         }
     }
 }
