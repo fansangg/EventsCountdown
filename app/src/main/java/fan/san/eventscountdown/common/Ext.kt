@@ -56,7 +56,7 @@ inline val Long.formatMd:String get(){
 inline val Long.getWeekDay:String get(){
     val calendar = Calendar.getInstance()
     calendar.timeInMillis = this
-    val weekDay = arrayOf("星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日")
+    val weekDay = arrayOf("星期日","星期一", "星期二", "星期三", "星期四", "星期五", "星期六")
     return weekDay[calendar.get(Calendar.DAY_OF_WEEK) - 1]
 }
 
