@@ -57,7 +57,7 @@ class EventsCountdownWidget : GlanceAppWidget() {
 
             GlanceTheme {
                 Box(
-                    modifier = GlanceModifier.padding(horizontal = 14.dp, vertical = 10.dp)
+                    modifier = GlanceModifier.padding(horizontal = 12.dp, vertical = 8.dp)
                         .fillMaxSize().background(
                             backgroundColor
                         ), contentAlignment = Alignment.Center

@@ -1,7 +1,9 @@
 package fan.san.eventscountdown.page
 
 import android.app.Activity
+import android.appwidget.AppWidgetManager
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -132,7 +134,8 @@ fun WidgetSettingsPage(glanceId: Int) {
                         .weight(1f)
                         .padding(12.dp)
                         .clickable {
-                            (context as Activity).setResult(Activity.RESULT_OK)
+                            val result = Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, glanceId)
+                            (context as Activity).setResult(Activity.RESULT_OK,result)
                             scope.launch {
                                 viewModel.updateWidgetInfos(glanceId)
                                 context.finish()
