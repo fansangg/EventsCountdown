@@ -3,6 +3,7 @@ package fan.san.eventscountdown.repository
 import android.content.ContentUris
 import android.content.Context
 import android.provider.CalendarContract
+import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import fan.san.eventscountdown.common.todayZeroTime
 import fan.san.eventscountdown.db.Events
@@ -27,6 +28,8 @@ class CountdownRepository @Inject constructor(
     suspend fun delete(events: Events) = eventsDao.delete(events)
     suspend fun update(isShow: Boolean, id: Long) = eventsDao.update(if (isShow) 1 else 0, id)
     fun getNextEvents() = eventsDao.getNextEvents(System.currentTimeMillis().todayZeroTime)
+
+    fun getAllTags() = eventsDao.getTags()
 
     fun deleteBefore7() = logsDao.deleteBefore7()
 
@@ -65,6 +68,10 @@ class CountdownRepository @Inject constructor(
             }
         }
 
+        Log.d(
+            "fansangg",
+            "CountdownRepository#queryCalendarAccounts: Accounts == ${list.joinToString()}"
+        )
         return list
     }
 
@@ -85,6 +92,7 @@ class CountdownRepository @Inject constructor(
                 CalendarContract.Instances.DESCRIPTION,
                 CalendarContract.Instances.ALL_DAY,
                 CalendarContract.Instances.BEGIN,
+                CalendarContract.Instances.CALENDAR_DISPLAY_NAME,
                 CalendarContract.Instances.END
             ),
             "(${CalendarContract.Instances.CALENDAR_ID} = ?)",
@@ -102,8 +110,10 @@ class CountdownRepository @Inject constructor(
                         it.getInt(it.getColumnIndexOrThrow(CalendarContract.Instances.ALL_DAY))
                     val begin =
                         it.getLong(it.getColumnIndexOrThrow(CalendarContract.Instances.BEGIN))
+                    val name =
+                        it.getString(it.getColumnIndexOrThrow(CalendarContract.Instances.CALENDAR_DISPLAY_NAME))
                     val end = it.getLong(it.getColumnIndexOrThrow(CalendarContract.Instances.END))
-                    list.add(Events(id, title, begin.todayZeroTime, 1))
+                    list.add(Events(id, title, begin.todayZeroTime, 1, tag = name))
                 } while (it.moveToNext())
             }
         }

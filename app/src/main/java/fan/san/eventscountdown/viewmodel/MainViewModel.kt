@@ -8,12 +8,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import fan.san.eventscountdown.common.todayZeroTime
 import fan.san.eventscountdown.db.Events
 import fan.san.eventscountdown.entity.CalendarAccountBean
 import fan.san.eventscountdown.entity.MessageEvent
 import fan.san.eventscountdown.repository.CountdownRepository
 import fan.san.eventscountdown.widget.EventsCountdownWidget
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -37,8 +39,21 @@ class MainViewModel @Inject constructor(
 
     val allEventsList = mutableStateListOf<Events>()
 
+    suspend fun getAllTags() =
+        viewModelScope.async(Dispatchers.IO) { repository.getAllTags() }.await()
+
     fun getCalendarAccounts() {
+        calendarAccounts.clear()
         calendarAccounts.addAll(repository.queryCalendarAccounts())
+    }
+
+    fun createEvents(title:String,date:Long,tag:String){
+        viewModelScope.launch(Dispatchers.IO) {
+            val ret = repository.insertEvents(Events(title = title, startDateTime = date.todayZeroTime, tag = tag))
+            if (ret != -1L){
+                _messageEvent.send(MessageEvent.SnackBarMessage(message = "已添加「$title」", id = System.currentTimeMillis()))
+            }
+        }
     }
 
     fun getCalendarEvents(accountId: Long) {
@@ -65,7 +80,7 @@ class MainViewModel @Inject constructor(
     fun getAllEvents() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.getAllEvents()
-                .collect{
+                .collect {
                     allEventsList.clear()
                     allEventsList.addAll(it)
                 }

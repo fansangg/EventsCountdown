@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.fastForEachIndexed
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import fan.san.eventscountdown.BuildConfig
@@ -92,7 +93,7 @@ fun LogPage(navHostController: NavHostController) {
                     offset = DpOffset((-5).dp, 2.dp),
                     modifier = Modifier.width(130.dp)
                 ) {
-                    viewModel.allDates.forEachIndexed { index, s ->
+                    viewModel.allDates.fastForEachIndexed { index, s ->
                         DropdownMenuItem(
                             text = {
                                 Text(

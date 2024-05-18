@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import fan.san.eventscountdown.common.CommonScaffold
+import fan.san.eventscountdown.common.HDivider
 import fan.san.eventscountdown.common.SpacerH
 import fan.san.eventscountdown.common.SpacerW
 import fan.san.eventscountdown.common.dynamicTextColor
@@ -134,8 +135,9 @@ fun WidgetSettingsPage(glanceId: Int) {
                         .weight(1f)
                         .padding(12.dp)
                         .clickable {
-                            val result = Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, glanceId)
-                            (context as Activity).setResult(Activity.RESULT_OK,result)
+                            val result =
+                                Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, glanceId)
+                            (context as Activity).setResult(Activity.RESULT_OK, result)
                             scope.launch {
                                 viewModel.updateWidgetInfos(glanceId)
                                 context.finish()
@@ -205,9 +207,9 @@ private fun AttributeSetting(viewModel: SettingsViewModel) {
             }
         }
 
-        SpacerH(6.dp)
-        HorizontalDivider(modifier = Modifier.padding(horizontal = 12.dp))
-        SpacerH(6.dp)
+
+        HDivider(vertical = 12.dp, horizontal = 12.dp)
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()

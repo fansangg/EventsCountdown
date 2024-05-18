@@ -20,7 +20,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -40,7 +39,7 @@ class SettingsViewModel @Inject constructor(
         Events(
             0L,
             "",
-            (System.currentTimeMillis().milliseconds + 7.days).inWholeMilliseconds
+            (System.currentTimeMillis().milliseconds + 7.days).inWholeMilliseconds, tag = ""
         )
     )
 

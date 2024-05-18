@@ -5,7 +5,9 @@ import android.icu.util.Calendar
 import android.text.format.DateFormat
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,17 +22,6 @@ import androidx.compose.ui.unit.dp
 //val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "widgetInfos")
 
 @Composable
-fun Int.SpacerW() {
-    Spacer(modifier = Modifier.width(this.dp))
-}
-
-
-@Composable
-fun Int.SpacerH() {
-    Spacer(modifier = Modifier.height(this.dp))
-}
-
-@Composable
 fun SpacerW(width: Dp) {
     Spacer(modifier = Modifier.width(width))
 }
@@ -38,6 +29,11 @@ fun SpacerW(width: Dp) {
 @Composable
 fun SpacerH(height: Dp) {
     Spacer(modifier = Modifier.height(height))
+}
+
+@Composable
+fun HDivider(vertical:Dp,horizontal:Dp = 0.dp) {
+    HorizontalDivider(modifier = Modifier.padding(vertical = vertical, horizontal = horizontal))
 }
 
 inline val Long.todayZeroTime:Long get(){
@@ -54,10 +50,7 @@ inline val Long.formatMd:String get(){
 }
 
 inline val Long.getWeekDay:String get(){
-    val calendar = Calendar.getInstance()
-    calendar.timeInMillis = this
-    val weekDay = arrayOf("星期日","星期一", "星期二", "星期三", "星期四", "星期五", "星期六")
-    return weekDay[calendar.get(Calendar.DAY_OF_WEEK) - 1]
+    return DateFormat.format("EEEE",this).toString()
 }
 
 inline val Long.toLunar:String

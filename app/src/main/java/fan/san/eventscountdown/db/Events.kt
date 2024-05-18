@@ -12,18 +12,19 @@ import kotlinx.coroutines.flow.Flow
 
 @Entity(tableName = "events")
 data class Events(
-    @PrimaryKey val id:Long,
+    @PrimaryKey(autoGenerate = true) val id:Long = 0,
     val title:String,
     @ColumnInfo(name = "start_date_time")
     val startDateTime:Long,
     val isShow:Int = 1,
+    @ColumnInfo(defaultValue = "自定义") val tag:String,
 ){
     @Dao
     interface EventsDao{
         @Query("SELECT * FROM events ORDER BY start_date_time")
         fun query():Flow<List<Events>>
         @Insert(onConflict = OnConflictStrategy.IGNORE)
-        suspend fun insert(vararg events: Events):List<Long>
+        suspend fun insert(events: Events):Long
 
         @Insert(onConflict = OnConflictStrategy.IGNORE)
         suspend fun insert(events: List<Events>):List<Long>
@@ -35,5 +36,8 @@ data class Events(
 
         @Query("SELECT * FROM events WHERE start_date_time > :time ORDER BY start_date_time LIMIT 1")
         fun getNextEvents(time: Long):List<Events>
+
+        @Query("SELECT DISTINCT tag FROM events")
+        fun getTags():List<String>
     }
 }
