@@ -46,7 +46,11 @@ inline val Long.todayZeroTime:Long get(){
     return calendar.timeInMillis
 }
 inline val Long.formatMd:String get(){
-    return DateFormat.format("M月d日", this).toString()
+    val calendar = Calendar.getInstance()
+    val year = calendar.get(Calendar.YEAR)
+    calendar.timeInMillis = this
+    val targetYear = calendar.get(Calendar.YEAR)
+    return if (year != targetYear) DateFormat.format("yyyy年M月d日", this).toString() else DateFormat.format("M月d日", this).toString()
 }
 
 inline val Long.getWeekDay:String get(){

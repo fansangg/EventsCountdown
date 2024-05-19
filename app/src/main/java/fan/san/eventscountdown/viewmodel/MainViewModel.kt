@@ -29,10 +29,6 @@ class MainViewModel @Inject constructor(
 
     var calendarAccounts = mutableStateListOf<CalendarAccountBean>()
 
-    //申请权限的时间，用于触发回调做计算，回调时间 - 申请时间 < 300ms，认为是已经永久拒绝了权限
-    var lastRequestPermissionTime = 0L
-    var isTriggershouldShowRationale = false
-
     private val _messageEvent: Channel<MessageEvent> = Channel()
 
     val messageEvent = _messageEvent.receiveAsFlow()
@@ -45,6 +41,13 @@ class MainViewModel @Inject constructor(
     fun getCalendarAccounts() {
         calendarAccounts.clear()
         calendarAccounts.addAll(repository.queryCalendarAccounts())
+    }
+
+    fun deleteEvent(events: Events){
+        viewModelScope.launch(Dispatchers.IO){
+            repository.delete(events)
+            EventsCountdownWidget().updateAll(context)
+        }
     }
 
     fun createEvents(title:String,date:Long,tag:String){

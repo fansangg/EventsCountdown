@@ -138,14 +138,14 @@ fun CommonScaffold(
 
 @Composable
 fun DialogWrapper(
-    dismiss: (() -> Unit)? = null,
+    dismiss: () -> Unit,
     dismissOnClickOutside: Boolean = false,
     dismissOnBackPress: Boolean = true,
     usePlatformDefaultWidth: Boolean = false,
     content: @Composable () -> Unit
 ) {
     Dialog(
-        onDismissRequest = { dismiss?.invoke() },
+        onDismissRequest = dismiss,
         properties = DialogProperties(
             dismissOnClickOutside = dismissOnClickOutside,
             dismissOnBackPress = dismissOnBackPress,
