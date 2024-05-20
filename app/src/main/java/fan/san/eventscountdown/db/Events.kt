@@ -4,13 +4,14 @@ import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
-@Entity(tableName = "events")
+@Entity(tableName = "events", indices = [Index(value = ["originId"], unique = true)])
 data class Events(
     @PrimaryKey(autoGenerate = true) val id:Long = 0,
     val title:String,
@@ -18,6 +19,7 @@ data class Events(
     val startDateTime:Long,
     val isShow:Int = 1,
     @ColumnInfo(defaultValue = "自定义") val tag:String,
+    val originId:Long? = null
 ){
     @Dao
     interface EventsDao{

@@ -120,14 +120,21 @@ fun HomePage(navController: NavController) {
                 showNoPermissionDialog = true
             }
         }else{
+            showAddFuncDialog = false
             showNoPermissionDialog = false
+            showImportDialog = true
         }
     }
 
     LaunchedEffect(key1 = permissionState.status) {
-        if (showNoPermissionDialog && permissionState.status.isGranted){
+        if (permissionState.status.isGranted){
             showNoPermissionDialog = false
+            if (showAddFuncDialog){
+                showAddFuncDialog = false
+                showImportDialog = true
+            }
         }
+
     }
 
     CommonScaffold(
@@ -152,9 +159,7 @@ fun HomePage(navController: NavController) {
                         showNewEventDialog = true
                     }) {
                         if (permissionState.status.isGranted) {
-                            if (viewModel.calendarAccounts.isEmpty()){
-                                viewModel.getCalendarAccounts()
-                            }
+                            showAddFuncDialog = false
                             showImportDialog = true
                         } else {
                             isTriggershouldShowRationale = permissionState.status.shouldShowRationale
@@ -173,9 +178,7 @@ fun HomePage(navController: NavController) {
                         DialogWrapper(
                             dismissOnClickOutside = true,
                             dismiss = { showImportDialog = false }) {
-                            ChooseAccountDialog(viewModel.calendarAccounts, getAccoounts = {
-                                viewModel.getCalendarAccounts()
-                            }, accountSelected = { id ->
+                            ChooseAccountDialog(accountSelected = { id ->
                                 showImportDialog = false
                                 viewModel.getCalendarEvents(id)
                             })
@@ -184,7 +187,6 @@ fun HomePage(navController: NavController) {
 
                     showNewEventDialog -> {
                         DialogWrapper(
-                            dismissOnClickOutside = true,
                             dismiss = { showNewEventDialog = false },
                             usePlatformDefaultWidth = false
                         ) {
@@ -209,6 +211,7 @@ fun HomePage(navController: NavController) {
                                         viewModel.getCalendarAccounts()
                                     }
                                     showImportDialog = true
+                                    showAddFuncDialog = false
                                 } else {
                                     isTriggershouldShowRationale = permissionState.status.shouldShowRationale
                                     permissionState.launchPermissionRequest()

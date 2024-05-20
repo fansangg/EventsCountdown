@@ -113,7 +113,8 @@ class CountdownRepository @Inject constructor(
                     val name =
                         it.getString(it.getColumnIndexOrThrow(CalendarContract.Instances.CALENDAR_DISPLAY_NAME))
                     val end = it.getLong(it.getColumnIndexOrThrow(CalendarContract.Instances.END))
-                    list.add(Events(id, title, begin.todayZeroTime, 1, tag = name))
+                    list.add(Events(originId = id, title = title,
+                        startDateTime = begin.todayZeroTime, isShow = 1, tag = name))
                 } while (it.moveToNext())
             }
         }

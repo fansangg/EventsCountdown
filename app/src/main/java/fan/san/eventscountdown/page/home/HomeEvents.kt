@@ -115,7 +115,7 @@ fun EventsList(state: LazyListState, allEventsList: List<Events>,delete: (Events
         verticalArrangement = Arrangement.spacedBy(12.dp),
         state = state
     ) {
-        items(pastEvents) {
+        items(pastEvents, key = { it.id} ) {
             EventItem(it, delete = delete)
         }
 
@@ -149,7 +149,7 @@ fun EventsList(state: LazyListState, allEventsList: List<Events>,delete: (Events
                 Text(text = "接下来", fontSize = 18.sp)
             }
         }
-        items(futureEvents) {
+        items(futureEvents, key = { it.id} ) {
             EventItem(it, delete = delete)
         }
     }

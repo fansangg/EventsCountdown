@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
 import kotlin.time.toJavaDuration
 
@@ -51,7 +50,7 @@ class UpdateCountdownWidgetWorker(
                     ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
                     PeriodicWorkRequest.Builder(
                         UpdateCountdownWidgetWorker::class.java,
-                        (23.hours + 59.minutes).toJavaDuration()
+                        24.hours.toJavaDuration()
                     ).setInitialDelay(delay, timeUnit = TimeUnit.MILLISECONDS)
                         .setInputData(inputData = workDataOf("id" to appWidgetId))
                         .build()

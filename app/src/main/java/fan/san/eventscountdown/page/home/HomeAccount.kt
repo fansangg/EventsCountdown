@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -25,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -38,26 +41,33 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import fan.san.eventscountdown.common.EmptyLottie
 import fan.san.eventscountdown.common.SpacerH
 import fan.san.eventscountdown.common.SpacerW
 import fan.san.eventscountdown.entity.CalendarAccountBean
+import fan.san.eventscountdown.viewmodel.MainViewModel
 
 @Composable
 fun ChooseAccountDialog(
-    calendarAccountsList: List<CalendarAccountBean>,
-    getAccoounts: () -> Unit,
     accountSelected: (Long) -> Unit
 ) {
+
+    val viewModel = hiltViewModel<MainViewModel>()
+    LaunchedEffect(key1 = Unit) {
+        if (viewModel.calendarAccounts.isEmpty()){
+            viewModel.getCalendarAccounts()
+        }
+    }
 
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth(.78f)
-            .height(320.dp)
+            .wrapContentHeight()
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -78,26 +88,27 @@ fun ChooseAccountDialog(
                 RefreshAccount(modifier = Modifier.constrainAs(refresh) {
                     centerVerticallyTo(titile)
                     start.linkTo(titile.end)
-                }, getAccoounts)
+                }, getAccoounts = {
+                    viewModel.getCalendarAccounts()
+                })
             }
 
-            if (calendarAccountsList.isEmpty()) {
+            if (viewModel.calendarAccounts.isEmpty()) {
                 NoAccount(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 12.dp)
-                        .weight(1f)
                 )
             } else {
                 LazyColumn(
                     modifier = Modifier
-                        .weight(1f)
                         .fillMaxWidth()
+                        .heightIn(max = 270.dp)
                         .padding(horizontal = 6.dp)
                         .padding(top = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(calendarAccountsList) {
+                    items(viewModel.calendarAccounts) {
                         AccountItem(bean = it) {
                             accountSelected.invoke(it.id)
                         }

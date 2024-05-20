@@ -4,7 +4,7 @@ import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 
-@Database(version = 4, entities = [Events::class,Logs::class,WidgetInfos::class],autoMigrations = [AutoMigration(from = 1, to = 2),AutoMigration(from = 2, to = 3),AutoMigration(from = 3, to = 4)])
+@Database(version = 5, entities = [Events::class,Logs::class,WidgetInfos::class],autoMigrations = [AutoMigration(from = 1, to = 2),AutoMigration(from = 2, to = 3),AutoMigration(from = 3, to = 4),AutoMigration(from = 4, to = 5)])
 abstract class AppDb:RoomDatabase() {
     abstract fun eventsDao(): Events.EventsDao
     abstract fun logsDao():Logs.LogsDao
