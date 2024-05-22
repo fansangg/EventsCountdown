@@ -7,6 +7,7 @@ import android.provider.Settings
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -62,7 +63,9 @@ import fan.san.eventscountdown.entity.MessageEvent
 import fan.san.eventscountdown.navigation.Pages
 import fan.san.eventscountdown.viewmodel.MainViewModel
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class,
+    ExperimentalFoundationApi::class
+)
 @Composable
 fun HomePage(navController: NavController) {
 
