@@ -293,17 +293,17 @@ fun NewEvent(cancel: () -> Unit, createEvents: (title: String, date: Long, tag: 
                     .padding(horizontal = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                EventsTagsItem(eventsTagsBean = tagsList[it]) { bean ->
-                    if (bean.isNew && bean.contet.isNotEmpty()) {
-                        tagsList.removeAt(0)
-                        tagsList.add(0, EventsTagsBean.getNewTag())
-                    } else if (bean.isNew && bean.contet.isEmpty()) {
+                EventsTagsItem(eventsTagsBean = tagsList[it] , onClick = { bean ->
+                    if (bean.isNew && bean.contet.isEmpty()) {
                         createTag = true
                     } else {
                         tagsList.forEachIndexed { index, _ ->
                             tagsList[index] = tagsList[index].copy(isSelected = it == index)
                         }
                     }
+                }){
+                    tagsList.removeAt(0)
+                    tagsList.add(0, EventsTagsBean.getNewTag())
                 }
             }
 
@@ -430,7 +430,7 @@ private fun CreateTagDialog(createTag: (String) -> Unit, cancel: () -> Unit) {
 }
 
 @Composable
-private fun EventsTagsItem(eventsTagsBean: EventsTagsBean, onClick: (EventsTagsBean) -> Unit) {
+private fun EventsTagsItem(eventsTagsBean: EventsTagsBean, onClick: (EventsTagsBean) -> Unit,clearClick:() -> Unit) {
     InputChip(selected = eventsTagsBean.isSelected,
         onClick = { onClick.invoke(eventsTagsBean) },
         label = {
@@ -441,7 +441,7 @@ private fun EventsTagsItem(eventsTagsBean: EventsTagsBean, onClick: (EventsTagsB
                 Icon(
                     imageVector = Icons.Default.Clear,
                     contentDescription = "clear",
-                    modifier = Modifier.size(FilterChipDefaults.IconSize)
+                    modifier = Modifier.size(FilterChipDefaults.IconSize).clickable(onClick = clearClick)
                 )
             }
         } else {

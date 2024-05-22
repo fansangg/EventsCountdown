@@ -1,13 +1,17 @@
-package fan.san.eventscountdown.page
+package fan.san.eventscountdown.page.setting
 
 import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.pdf.PdfDocument.Page
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,8 +25,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Slider
@@ -31,10 +40,12 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -45,6 +56,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import fan.san.eventscountdown.common.CommonScaffold
 import fan.san.eventscountdown.common.HDivider
 import fan.san.eventscountdown.common.SpacerH
@@ -52,19 +64,21 @@ import fan.san.eventscountdown.common.SpacerW
 import fan.san.eventscountdown.common.dynamicTextColor
 import fan.san.eventscountdown.common.formatMd
 import fan.san.eventscountdown.common.getWeekDay
+import fan.san.eventscountdown.navigation.Pages
 import fan.san.eventscountdown.utils.CommonUtil
 import fan.san.eventscountdown.viewmodel.SettingsViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun WidgetSettingsPage(glanceId: Int) {
+fun WidgetSettingsPage(navHostController: NavHostController,glanceId: Int) {
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     Log.d("fansangg", "#WidgetSettingsPage: glanceId == $glanceId")
+
 
 
     val viewModel = hiltViewModel<SettingsViewModel>()
@@ -105,6 +119,35 @@ fun WidgetSettingsPage(glanceId: Int) {
                 SpacerH(height = 8.dp)
 
                 AttributeSetting(viewModel)
+
+                SpacerH(height = 12.dp)
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp)
+                        .padding(horizontal = 12.dp)
+                        .clip(shape = RoundedCornerShape(12.dp))
+                        .background(
+                            MaterialTheme.colorScheme.surfaceContainerHigh
+                        ).clickable {
+                            navHostController.navigate(route = Pages.SelectEvent.withParam(glanceId))
+                        }
+                , verticalArrangement = Arrangement.Center){
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp), horizontalArrangement = Arrangement.SpaceBetween){
+                        Text(
+                            text = "选择事件",
+                            fontSize = 16.sp,
+                        )
+
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = "jump"
+                        )
+                    }
+                }
             }
 
             Row(

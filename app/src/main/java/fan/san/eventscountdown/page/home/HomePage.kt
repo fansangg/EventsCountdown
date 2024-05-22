@@ -115,11 +115,11 @@ fun HomePage(navController: NavController) {
 
     val permissionState = rememberPermissionState(permission = Manifest.permission.READ_CALENDAR) {
         if (!it) {
-            if (isTriggershouldShowRationale)  showNoPermissionDialog = true
+            if (isTriggershouldShowRationale) showNoPermissionDialog = true
             if (System.currentTimeMillis() - lastRequestPermissionTime < 300) {
                 showNoPermissionDialog = true
             }
-        }else{
+        } else {
             showAddFuncDialog = false
             showNoPermissionDialog = false
             showImportDialog = true
@@ -127,9 +127,9 @@ fun HomePage(navController: NavController) {
     }
 
     LaunchedEffect(key1 = permissionState.status) {
-        if (permissionState.status.isGranted){
+        if (permissionState.status.isGranted) {
             showNoPermissionDialog = false
-            if (showAddFuncDialog){
+            if (showAddFuncDialog) {
                 showAddFuncDialog = false
                 showImportDialog = true
             }
@@ -162,13 +162,14 @@ fun HomePage(navController: NavController) {
                             showAddFuncDialog = false
                             showImportDialog = true
                         } else {
-                            isTriggershouldShowRationale = permissionState.status.shouldShowRationale
+                            isTriggershouldShowRationale =
+                                permissionState.status.shouldShowRationale
                             permissionState.launchPermissionRequest()
                             lastRequestPermissionTime = System.currentTimeMillis()
                         }
                     }
                 } else {
-                    EventsList(lazyListState, viewModel.allEventsList){ event ->
+                    EventsList(lazyListState, viewModel.allEventsList) { event ->
                         viewModel.deleteEvent(event)
                     }
                 }
@@ -195,7 +196,6 @@ fun HomePage(navController: NavController) {
                                 createEvents = { title, date, tag ->
                                     viewModel.createEvents(title, date, tag)
                                     showNewEventDialog = false
-                                    showAddFuncDialog = false
                                 })
                         }
                     }
@@ -205,15 +205,19 @@ fun HomePage(navController: NavController) {
                             dismiss = { showAddFuncDialog = false },
                             dismissOnClickOutside = true
                         ) {
-                            AddFuncDialog(add = { showNewEventDialog = true }) {
+                            AddFuncDialog(add = {
+                                showNewEventDialog = true
+                                showAddFuncDialog = false
+                            }) {
                                 if (permissionState.status.isGranted) {
-                                    if (viewModel.calendarAccounts.isEmpty()){
+                                    if (viewModel.calendarAccounts.isEmpty()) {
                                         viewModel.getCalendarAccounts()
                                     }
                                     showImportDialog = true
                                     showAddFuncDialog = false
                                 } else {
-                                    isTriggershouldShowRationale = permissionState.status.shouldShowRationale
+                                    isTriggershouldShowRationale =
+                                        permissionState.status.shouldShowRationale
                                     permissionState.launchPermissionRequest()
                                     lastRequestPermissionTime = System.currentTimeMillis()
                                 }
@@ -222,9 +226,9 @@ fun HomePage(navController: NavController) {
                     }
                 }
 
-                if (showNoPermissionDialog){
-                    DialogWrapper(dismiss = { showNoPermissionDialog = false}) {
-                        NoPremissionDialog(cancel = {showNoPermissionDialog = false}){
+                if (showNoPermissionDialog) {
+                    DialogWrapper(dismiss = { showNoPermissionDialog = false }) {
+                        NoPremissionDialog(cancel = { showNoPermissionDialog = false }) {
                             val intent = Intent(
                                 Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                                 Uri.fromParts("package", context.packageName, null)
@@ -274,12 +278,12 @@ private fun NoPremissionDialog(cancel: () -> Unit, jump2Setting: () -> Unit) {
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
             ) {
-                TextButton(onClick =  cancel) {
+                TextButton(onClick = cancel) {
                     Text(text = "取消", fontSize = MaterialTheme.typography.bodyLarge.fontSize)
                 }
                 SpacerW(width = 12.dp)
                 TextButton(onClick = jump2Setting) {
-                    Text(text = "前往设置",fontSize = MaterialTheme.typography.bodyLarge.fontSize)
+                    Text(text = "前往设置", fontSize = MaterialTheme.typography.bodyLarge.fontSize)
                 }
             }
         }
