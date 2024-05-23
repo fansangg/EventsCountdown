@@ -28,6 +28,8 @@ class WidgetsInfoRepository @Inject constructor(
 
     fun insertEventWidgetCrossRef(eventWidgetCrossRefList: List<EventWidgetCrossRef>) = refDao.insert(eventWidgetCrossRefList)
 
+    fun queryWidgetWithEvents(id:Int) = dao.getWidgetEvents(id)
+
     suspend fun updateWidgetInfoState(widgetInfo: WidgetInfo, nextEvents:Events){
         GlanceAppWidgetManager(context).apply {
             updateAppWidgetState(context, getGlanceIdBy(widgetInfo.id)) {

@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.Insert
 
 
@@ -19,10 +20,13 @@ import androidx.room.Insert
         parentColumns = ["id"],
         childColumns = ["widgetId"],
         onDelete = ForeignKey.CASCADE
-    )]
+    )],
+    indices = [Index(value = ["eventId"]),Index(value = ["widgetId"])]
 )
 class EventWidgetCrossRef(
+    @ColumnInfo(name = "eventId")
     val eventId: Long,
+    @ColumnInfo(name = "widgetId")
     val widgetId: Long
 ){
     @Dao

@@ -7,9 +7,9 @@ import androidx.room.Relation
 class WidgetWithEvents(
     @Embedded val widget:WidgetInfo,
     @Relation(
-        parentColumn = "widgetId",
-        entityColumn = "eventId",
-        associateBy = Junction(EventWidgetCrossRef::class)
+        parentColumn = "id",
+        entityColumn = "id",
+        associateBy = Junction(EventWidgetCrossRef::class, parentColumn = "widgetId", entityColumn = "eventId")
     )
     val events:List<Events>
 )

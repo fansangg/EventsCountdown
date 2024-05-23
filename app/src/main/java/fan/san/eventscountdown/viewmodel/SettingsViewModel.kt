@@ -1,6 +1,7 @@
 package fan.san.eventscountdown.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -12,13 +13,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import fan.san.eventscountdown.common.defaultLightColor
 import fan.san.eventscountdown.common.defaultNightColor
-import fan.san.eventscountdown.db.EventWidgetCrossRef
 import fan.san.eventscountdown.db.Events
 import fan.san.eventscountdown.db.WidgetInfo
 import fan.san.eventscountdown.repository.CountdownRepository
 import fan.san.eventscountdown.repository.WidgetsInfoRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -97,11 +96,13 @@ class SettingsViewModel @Inject constructor(
 
     fun testInsert(id:Int){
         viewModelScope.launch(Dispatchers.IO){
-            val list = countdownRepository.getAllEvents().first()
+            val list = widgetsInfoRepository.queryWidgetWithEvents(id)
+            Log.d("fansangg", "testInsert: ${list.joinToString(",")} ")
+            /*val list = countdownRepository.getAllEvents().first()
             val insertList = list.map {
                 EventWidgetCrossRef(eventId = it.id, widgetId = id.toLong())
             }
-            widgetsInfoRepository.insertEventWidgetCrossRef(insertList)
+            widgetsInfoRepository.insertEventWidgetCrossRef(insertList)*/
         }
     }
 }

@@ -33,6 +33,6 @@ data class WidgetInfo(
 
         @Transaction
         @Query("SELECT * FROM widget_info where :id = id")
-        fun getWidgetEvents(id:Long):List<WidgetWithEvents>
+        fun getWidgetEvents(id:Int):List<WidgetWithEvents>
     }
 }
