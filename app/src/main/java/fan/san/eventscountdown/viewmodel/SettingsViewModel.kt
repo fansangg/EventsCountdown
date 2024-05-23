@@ -12,11 +12,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import fan.san.eventscountdown.common.defaultLightColor
 import fan.san.eventscountdown.common.defaultNightColor
+import fan.san.eventscountdown.db.EventWidgetCrossRef
 import fan.san.eventscountdown.db.Events
-import fan.san.eventscountdown.db.WidgetInfos
+import fan.san.eventscountdown.db.WidgetInfo
 import fan.san.eventscountdown.repository.CountdownRepository
 import fan.san.eventscountdown.repository.WidgetsInfoRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -60,7 +62,7 @@ class SettingsViewModel @Inject constructor(
     var selectedOption by mutableStateOf(radioOptions[0])
     var followSystem by mutableStateOf(false)
 
-    fun getWidgetInfos(id: Int) {
+    fun getWidgetInfo(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             val ret = widgetsInfoRepository.queryById(id = id)
             if (ret.isNotEmpty()) {
@@ -84,12 +86,22 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun updateWidgetInfos(glaceId: Int) {
+    fun updateWidgetInfo(glaceId: Int) {
 
-        val widgetInfos = WidgetInfos(glaceId, color = currentColor, selectedOption, followSystem = followSystem)
+        val widgetInfo = WidgetInfo(glaceId, color = currentColor, selectedOption, followSystem = followSystem)
         viewModelScope.launch(Dispatchers.IO) {
-            widgetsInfoRepository.insert(widgetInfos)
-            widgetsInfoRepository.updateWidgetInfosState(widgetInfos, nextEvents)
+            widgetsInfoRepository.insert(widgetInfo)
+            widgetsInfoRepository.updateWidgetInfoState(widgetInfo, nextEvents)
+        }
+    }
+
+    fun testInsert(id:Int){
+        viewModelScope.launch(Dispatchers.IO){
+            val list = countdownRepository.getAllEvents().first()
+            val insertList = list.map {
+                EventWidgetCrossRef(eventId = it.id, widgetId = id.toLong())
+            }
+            widgetsInfoRepository.insertEventWidgetCrossRef(insertList)
         }
     }
 }

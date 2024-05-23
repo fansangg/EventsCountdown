@@ -7,11 +7,12 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.TypeConverters
 
-@Entity(tableName = "widget_infos")
+@Entity(tableName = "widget_info")
 @TypeConverters(Converters::class)
-data class WidgetInfos(
+data class WidgetInfo(
     @PrimaryKey val id: Int,
     var color: Color,
     var colorOption:String = "白色",
@@ -19,15 +20,19 @@ data class WidgetInfos(
     var backgroundImg: String? = null,
 ){
     @Dao
-    interface WidgetInfosDao{
+    interface WidgetInfoDao{
 
         @Insert(onConflict = OnConflictStrategy.REPLACE)
-        fun insert(widgetInfos: WidgetInfos)
+        fun insert(widgetInfo: WidgetInfo)
 
-        @Query("SELECT * FROM widget_infos WHERE :id = id")
-        fun queryById(id: Int):List<WidgetInfos>
+        @Query("SELECT * FROM widget_info WHERE :id = id")
+        fun queryById(id: Int):List<WidgetInfo>
 
-        @Query("DELETE FROM widget_infos WHERE :id = id")
+        @Query("DELETE FROM widget_info WHERE :id = id")
         fun delete(id:Int)
+
+        @Transaction
+        @Query("SELECT * FROM widget_info where :id = id")
+        fun getWidgetEvents(id:Long):List<WidgetWithEvents>
     }
 }

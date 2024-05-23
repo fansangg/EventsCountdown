@@ -125,7 +125,7 @@ class EventsCountdownWidget : GlanceAppWidget() {
             .getCountdownRepository()
         val widgetsInfoRepository =
             EntryPointAccessors.fromApplication<EventsCountdownEntryPoint>(context)
-                .getWidgetInfosRepository()
+                .getWidgetInfoRepository()
         widgetsInfoRepository.deleteById(GlanceAppWidgetManager(context).getAppWidgetId(glanceId))
         repository.insertLogs(Logs.create("小组件移除 id == $glanceId"))
         Log.d("fansangg", "小组件移除 id == $glanceId")

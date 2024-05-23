@@ -29,5 +29,9 @@ class DbModule {
 
     @Singleton
     @Provides
-    fun provideWidgetInfosDao(db: AppDb):WidgetInfos.WidgetInfosDao = db.widgetInfosDao()
+    fun provideWidgetInfoDao(db: AppDb):WidgetInfo.WidgetInfoDao = db.widgetInfoDao()
+
+    @Singleton
+    @Provides
+    fun provideEventWidgetCrossRrfDao(db: AppDb):EventWidgetCrossRef.EventWidgetCrossRefDao = db.eventWidgetCrossRefDao()
 }

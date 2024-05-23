@@ -58,7 +58,6 @@ import fan.san.eventscountdown.common.SpacerW
 import fan.san.eventscountdown.common.dynamicTextColor
 import fan.san.eventscountdown.common.formatMd
 import fan.san.eventscountdown.common.getWeekDay
-import fan.san.eventscountdown.navigation.Pages
 import fan.san.eventscountdown.utils.CommonUtil
 import fan.san.eventscountdown.viewmodel.SettingsViewModel
 import kotlinx.coroutines.launch
@@ -78,7 +77,7 @@ fun WidgetSettingsPage(navHostController: NavHostController,glanceId: Int) {
     val viewModel = hiltViewModel<SettingsViewModel>()
 
     LaunchedEffect(key1 = Unit) {
-        viewModel.getWidgetInfos(glanceId)
+        viewModel.getWidgetInfo(glanceId)
     }
 
     BackHandler() {
@@ -125,7 +124,8 @@ fun WidgetSettingsPage(navHostController: NavHostController,glanceId: Int) {
                         .background(
                             MaterialTheme.colorScheme.surfaceContainerHigh
                         ).clickable {
-                            navHostController.navigate(route = Pages.SelectEvent.withParam(glanceId))
+                            //navHostController.navigate(route = Pages.SelectEvent.withParam(glanceId))
+                                    viewModel.testInsert(glanceId)
                         }
                 , verticalArrangement = Arrangement.Center){
                     Row(modifier = Modifier
@@ -176,7 +176,7 @@ fun WidgetSettingsPage(navHostController: NavHostController,glanceId: Int) {
                                 Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, glanceId)
                             (context as Activity).setResult(Activity.RESULT_OK, result)
                             scope.launch {
-                                viewModel.updateWidgetInfos(glanceId)
+                                viewModel.updateWidgetInfo(glanceId)
                                 context.finish()
                             }
                         }, contentAlignment = Alignment.Center

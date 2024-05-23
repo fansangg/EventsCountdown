@@ -1,5 +1,6 @@
 package fan.san.eventscountdown.db
 
+import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -14,7 +15,7 @@ import androidx.room.Insert
         childColumns = ["eventId"],
         onDelete = ForeignKey.CASCADE
     ), ForeignKey(
-        entity = WidgetInfos::class,
+        entity = WidgetInfo::class,
         parentColumns = ["id"],
         childColumns = ["widgetId"],
         onDelete = ForeignKey.CASCADE
@@ -27,6 +28,6 @@ class EventWidgetCrossRef(
     @Dao
     interface EventWidgetCrossRefDao {
         @Insert
-        fun insert(eventWidgetCrossRef: EventWidgetCrossRef)
+        fun insert(eventWidgetCrossRefList: List<EventWidgetCrossRef>)
     }
 }

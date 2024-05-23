@@ -10,6 +10,6 @@ interface EventsCountdownEntryPoint {
 
     fun getCountdownRepository(): CountdownRepository
 
-    fun getWidgetInfosRepository():WidgetsInfoRepository
+    fun getWidgetInfoRepository():WidgetsInfoRepository
 
 }
