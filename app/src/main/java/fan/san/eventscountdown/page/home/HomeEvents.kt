@@ -24,6 +24,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -474,7 +476,7 @@ private fun MyDatePickerDialog(cancel: () -> Unit, confirm: (Long) -> Unit) {
 }
 
 @Composable
-private fun EventItem(events: Events,delete: (Events) -> Unit) {
+private fun LazyItemScope.EventItem(events: Events,delete: (Events) -> Unit) {
 
     val maxWidth = (-120).dp
 
@@ -486,7 +488,7 @@ private fun EventItem(events: Events,delete: (Events) -> Unit) {
 
     ElevatedCard(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth().animateItem(),
         colors = CardDefaults.elevatedCardColors().copy(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
     ) {
         Box(

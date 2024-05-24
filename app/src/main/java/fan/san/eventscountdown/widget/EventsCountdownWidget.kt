@@ -14,6 +14,7 @@ import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
+import androidx.glance.color.DayNightColorProvider
 import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
@@ -59,7 +60,7 @@ class EventsCountdownWidget : GlanceAppWidget() {
                 Box(
                     modifier = GlanceModifier.padding(horizontal = 12.dp, vertical = 8.dp)
                         .fillMaxSize().background(
-                            backgroundColor
+                            colorProvider = androidx.glance.color.ColorProvider(Color.White,Color.Black)
                         ), contentAlignment = Alignment.Center
                 ) {
 

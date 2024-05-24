@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -33,6 +32,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -58,20 +58,20 @@ import fan.san.eventscountdown.common.SpacerW
 import fan.san.eventscountdown.common.dynamicTextColor
 import fan.san.eventscountdown.common.formatMd
 import fan.san.eventscountdown.common.getWeekDay
+import fan.san.eventscountdown.navigation.Pages
 import fan.san.eventscountdown.utils.CommonUtil
 import fan.san.eventscountdown.viewmodel.SettingsViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WidgetSettingsPage(navHostController: NavHostController,glanceId: Int) {
+fun WidgetSettingsPage(navHostController: NavHostController, glanceId: Int) {
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     Log.d("fansangg", "#WidgetSettingsPage: glanceId == $glanceId")
-
 
 
     val viewModel = hiltViewModel<SettingsViewModel>()
@@ -123,14 +123,16 @@ fun WidgetSettingsPage(navHostController: NavHostController,glanceId: Int) {
                         .clip(shape = RoundedCornerShape(12.dp))
                         .background(
                             MaterialTheme.colorScheme.surfaceContainerHigh
-                        ).clickable {
-                            //navHostController.navigate(route = Pages.SelectEvent.withParam(glanceId))
-                                    viewModel.testInsert(glanceId)
-                        }
-                , verticalArrangement = Arrangement.Center){
-                    Row(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp), horizontalArrangement = Arrangement.SpaceBetween){
+                        )
+                        .clickable {
+                            navHostController.navigate(route = Pages.SelectEvent.withParam(glanceId))
+                        }, verticalArrangement = Arrangement.Center) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         Text(
                             text = "选择事件",
                             fontSize = 16.sp,
@@ -150,14 +152,12 @@ fun WidgetSettingsPage(navHostController: NavHostController,glanceId: Int) {
                     .height(80.dp)
             ) {
 
-                Box(
+                TextButton(
+                    onClick = { cancelSetting(context) },
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(1f)
                         .padding(12.dp)
-                        .clickable {
-                            cancelSetting(context)
-                        }, contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "取消",
@@ -166,20 +166,20 @@ fun WidgetSettingsPage(navHostController: NavHostController,glanceId: Int) {
                 }
 
 
-                Box(
+                TextButton(
+                    onClick = {
+                        val result =
+                            Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, glanceId)
+                        (context as Activity).setResult(Activity.RESULT_OK, result)
+                        scope.launch {
+                            viewModel.updateWidgetInfo(glanceId)
+                            context.finish()
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(1f)
-                        .padding(12.dp)
-                        .clickable {
-                            val result =
-                                Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, glanceId)
-                            (context as Activity).setResult(Activity.RESULT_OK, result)
-                            scope.launch {
-                                viewModel.updateWidgetInfo(glanceId)
-                                context.finish()
-                            }
-                        }, contentAlignment = Alignment.Center
+                        .padding(12.dp), enabled = viewModel.eventsList.isNotEmpty()
                 ) {
                     Text(
                         text = "确定",
@@ -231,7 +231,11 @@ private fun AttributeSetting(viewModel: SettingsViewModel) {
 
                 SpacerW(12.dp)
 
-                Text(text = text, fontSize = 16.sp, modifier = Modifier.alpha(if (viewModel.followSystem) .6f else 1f))
+                Text(
+                    text = text,
+                    fontSize = 16.sp,
+                    modifier = Modifier.alpha(if (viewModel.followSystem) .6f else 1f)
+                )
             }
 
             if (index != viewModel.radioOptions.size - 1) {
@@ -266,21 +270,28 @@ private fun AttributeSetting(viewModel: SettingsViewModel) {
                 }, steps = 9, valueRange = 0f..1f, modifier = Modifier
                     .weight(1f)
                     .height(40.dp), track = {
-                        SliderDefaults.Track(sliderState = it, modifier = Modifier.scale(scaleX = 1f, scaleY = 1.2f))
+                    SliderDefaults.Track(
+                        sliderState = it,
+                        modifier = Modifier.scale(scaleX = 1f, scaleY = 1.2f)
+                    )
                 }
             )
         }
 
         HDivider(vertical = 12.dp, horizontal = 12.dp)
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp)
-            .padding(bottom = 12.dp)
-            .background(
-                MaterialTheme.colorScheme.surfaceContainerHigh,
-                shape = RoundedCornerShape(12.dp)
-            ), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically){
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp)
+                .padding(bottom = 12.dp)
+                .background(
+                    MaterialTheme.colorScheme.surfaceContainerHigh,
+                    shape = RoundedCornerShape(12.dp)
+                ),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
 
             Text(text = "跟随系统", fontSize = 16.sp)
 
@@ -324,48 +335,59 @@ private fun WidgetPreview(
                 )
                 .padding(horizontal = 14.dp, vertical = 10.dp)
         ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                Text(
-                    text = viewModel.nextEvents.title.ifEmpty { "春节" },
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.W700,
-                    color = viewModel.currentColor.dynamicTextColor
-                )
+            if (viewModel.eventsList.isNotEmpty()) {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    Text(
+                        text = viewModel.eventsList.first().title,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.W700,
+                        color = viewModel.currentColor.dynamicTextColor
+                    )
 
-                Text(
-                    text = "${viewModel.nextEvents.startDateTime.formatMd}  ${viewModel.nextEvents.startDateTime.getWeekDay}",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.W700,
-                    color = viewModel.currentColor.dynamicTextColor
-                )
+                    Text(
+                        text = "${viewModel.eventsList.first().startDateTime.formatMd}  ${viewModel.eventsList.first().startDateTime.getWeekDay}",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.W700,
+                        color = viewModel.currentColor.dynamicTextColor
+                    )
 
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.BottomEnd
-                ) {
-                    Row {
-                        Text(
-                            text = "还剩 ",
-                            modifier = Modifier.alignByBaseline(),
-                            fontSize = 16.sp,
-                            color = viewModel.currentColor.dynamicTextColor
-                        )
-                        Text(
-                            text = CommonUtil.getDaysDiff(viewModel.nextEvents.startDateTime),
-                            modifier = Modifier.alignByBaseline(),
-                            fontSize = 37.sp,
-                            color = viewModel.currentColor.dynamicTextColor,
-                            fontWeight = FontWeight.W700
-                        )
-                        Text(
-                            text = " 天",
-                            modifier = Modifier.alignByBaseline(),
-                            fontSize = 16.sp,
-                            color = viewModel.currentColor.dynamicTextColor
-                        )
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.BottomEnd
+                    ) {
+                        Row {
+                            Text(
+                                text = "还剩 ",
+                                modifier = Modifier.alignByBaseline(),
+                                fontSize = 16.sp,
+                                color = viewModel.currentColor.dynamicTextColor
+                            )
+                            Text(
+                                text = CommonUtil.getDaysDiff(viewModel.eventsList.first().startDateTime),
+                                modifier = Modifier.alignByBaseline(),
+                                fontSize = 37.sp,
+                                color = viewModel.currentColor.dynamicTextColor,
+                                fontWeight = FontWeight.W700
+                            )
+                            Text(
+                                text = " 天",
+                                modifier = Modifier.alignByBaseline(),
+                                fontSize = 16.sp,
+                                color = viewModel.currentColor.dynamicTextColor
+                            )
+                        }
                     }
                 }
+            } else {
+                Text(
+                    text = "当前无事件",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.W700,
+                    color = viewModel.currentColor.dynamicTextColor,
+                    modifier = Modifier.align(alignment = Alignment.Center)
+                )
             }
+
         }
     }
 }

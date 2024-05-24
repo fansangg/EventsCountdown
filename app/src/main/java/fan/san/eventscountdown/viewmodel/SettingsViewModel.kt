@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
@@ -36,25 +37,8 @@ class SettingsViewModel @Inject constructor(
     private val widgetsInfoRepository: WidgetsInfoRepository
 ) : ViewModel() {
 
-    var nextEvents by mutableStateOf(
-        Events(
-            0L,
-            "",
-            (System.currentTimeMillis().milliseconds + 7.days).inWholeMilliseconds, tag = ""
-        )
-    )
 
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            val nextEventsList = countdownRepository.getNextEvents()
-            if (nextEventsList.isNotEmpty()) {
-                withContext(Dispatchers.Main){
-                    nextEvents = nextEventsList.first()
-                }
-            }
-        }
-    }
-
+    val eventsList = mutableStateListOf<Events>()
     val radioOptions = listOf("白色", "黑色")
     var currentColor by mutableStateOf(Color(253, 253, 253))
     var currentAlpha by mutableFloatStateOf(1f)
@@ -63,12 +47,14 @@ class SettingsViewModel @Inject constructor(
 
     fun getWidgetInfo(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            val ret = widgetsInfoRepository.queryById(id = id)
+            val ret = widgetsInfoRepository.queryWidgetWithEvents(id = id)
             if (ret.isNotEmpty()) {
-                currentColor = ret.first().color
+                currentColor = ret.first().widget.color
                 currentAlpha = currentColor.alpha
-                selectedOption = ret.first().colorOption
-                followSystem = ret.first().followSystem
+                selectedOption = ret.first().widget.colorOption
+                followSystem = ret.first().widget.followSystem
+                eventsList.clear()
+                eventsList.addAll(ret.first().events)
             }
         }
     }
@@ -90,19 +76,7 @@ class SettingsViewModel @Inject constructor(
         val widgetInfo = WidgetInfo(glaceId, color = currentColor, selectedOption, followSystem = followSystem)
         viewModelScope.launch(Dispatchers.IO) {
             widgetsInfoRepository.insert(widgetInfo)
-            widgetsInfoRepository.updateWidgetInfoState(widgetInfo, nextEvents)
-        }
-    }
-
-    fun testInsert(id:Int){
-        viewModelScope.launch(Dispatchers.IO){
-            val list = widgetsInfoRepository.queryWidgetWithEvents(id)
-            Log.d("fansangg", "testInsert: ${list.joinToString(",")} ")
-            /*val list = countdownRepository.getAllEvents().first()
-            val insertList = list.map {
-                EventWidgetCrossRef(eventId = it.id, widgetId = id.toLong())
-            }
-            widgetsInfoRepository.insertEventWidgetCrossRef(insertList)*/
+            widgetsInfoRepository.updateWidgetInfoState(widgetInfo, eventsList.first())
         }
     }
 }
