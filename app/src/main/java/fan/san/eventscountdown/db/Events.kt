@@ -1,5 +1,6 @@
 package fan.san.eventscountdown.db
 
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Delete
@@ -10,7 +11,12 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
+
+@Parcelize
+@Serializable
 @Entity(tableName = "events", indices = [Index(value = ["originId"], unique = true)])
 data class Events(
     @PrimaryKey(autoGenerate = true) val id:Long = 0,
@@ -20,7 +26,7 @@ data class Events(
     val isShow:Int = 1,
     @ColumnInfo(defaultValue = "自定义") val tag:String,
     val originId:Long? = null
-){
+):Parcelable{
     @Dao
     interface EventsDao{
         @Query("SELECT * FROM events ORDER BY start_date_time")
@@ -36,8 +42,8 @@ data class Events(
         @Query("UPDATE events SET isShow = :isShow where id = :id")
         suspend fun update(isShow: Int,id: Long):Int
 
-        @Query("SELECT * FROM events WHERE start_date_time > :time ORDER BY start_date_time LIMIT 1")
-        fun getNextEvents(time: Long):List<Events>
+        @Query("SELECT * FROM events WHERE start_date_time > :time ORDER BY start_date_time LIMIT :limit")
+        fun getNextEvents(time: Long,limit: Int = 1):List<Events>
 
         @Query("SELECT DISTINCT tag FROM events")
         fun getTags():List<String>

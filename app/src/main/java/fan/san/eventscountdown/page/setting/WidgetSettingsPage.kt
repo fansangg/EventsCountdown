@@ -50,7 +50,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import fan.san.eventscountdown.common.CommonScaffold
 import fan.san.eventscountdown.common.HDivider
 import fan.san.eventscountdown.common.SpacerH
@@ -58,7 +57,9 @@ import fan.san.eventscountdown.common.SpacerW
 import fan.san.eventscountdown.common.dynamicTextColor
 import fan.san.eventscountdown.common.formatMd
 import fan.san.eventscountdown.common.getWeekDay
-import fan.san.eventscountdown.navigation.Pages
+import fan.san.eventscountdown.db.Events
+import fan.san.eventscountdown.navigation.Routes
+import fan.san.eventscountdown.page.LocalNavController
 import fan.san.eventscountdown.utils.CommonUtil
 import fan.san.eventscountdown.viewmodel.SettingsViewModel
 import kotlinx.coroutines.launch
@@ -66,8 +67,8 @@ import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WidgetSettingsPage(navHostController: NavHostController, glanceId: Int) {
-
+fun WidgetSettingsPage(glanceId: Int) {
+    val navHostController = LocalNavController.current
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
@@ -79,6 +80,13 @@ fun WidgetSettingsPage(navHostController: NavHostController, glanceId: Int) {
     LaunchedEffect(key1 = Unit) {
         viewModel.getWidgetInfo(glanceId)
     }
+
+    LaunchedEffect(key1 = Unit) {
+        val r = navHostController.currentBackStackEntry?.savedStateHandle?.get<List<Events>>("list")
+        Log.d("fansangg", "WidgetSettingsPage: shoudaole r == $r")
+    }
+
+
 
     BackHandler() {
         cancelSetting(context)
@@ -125,18 +133,27 @@ fun WidgetSettingsPage(navHostController: NavHostController, glanceId: Int) {
                             MaterialTheme.colorScheme.surfaceContainerHigh
                         )
                         .clickable {
-                            navHostController.navigate(route = Pages.SelectEvent.withParam(glanceId))
-                        }, verticalArrangement = Arrangement.Center) {
+                            navHostController.navigate(route = Routes.SelectEvent(viewModel.eventsList))
+                        }, verticalArrangement = Arrangement.Center
+                ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "选择事件",
-                            fontSize = 16.sp,
-                        )
+
+                        Column {
+                            Text(
+                                text = "选择事件",
+                                fontSize = 16.sp,
+                            )
+
+
+                            Text(text = if (viewModel.eventsList.isEmpty()) "当前未选择事件" else "已选择${viewModel.eventsList.size}条事件", fontSize = 14.sp, modifier = Modifier.alpha(.5f))
+                        }
+
 
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,

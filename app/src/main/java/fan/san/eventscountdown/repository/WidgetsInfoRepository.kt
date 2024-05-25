@@ -36,6 +36,7 @@ class WidgetsInfoRepository @Inject constructor(
                 it[CountdownWidgetStateKeys.backgroundColor] = widgetInfo.color.toArgb()
                 it[CountdownWidgetStateKeys.title] = nextEvents.title
                 it[CountdownWidgetStateKeys.date] = nextEvents.startDateTime
+                it[CountdownWidgetStateKeys.isFollowSystem] = widgetInfo.followSystem
             }
             UpdateCountdownWidgetWorker.enqueuePeriodWork(context,getGlanceIdBy(widgetInfo.id))
             EventsCountdownWidget().update(context, getGlanceIdBy(widgetInfo.id))

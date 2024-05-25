@@ -27,7 +27,7 @@ class CountdownRepository @Inject constructor(
     suspend fun insertEvents(events: List<Events>) = eventsDao.insert(events)
     suspend fun delete(events: Events) = eventsDao.delete(events)
     suspend fun update(isShow: Boolean, id: Long) = eventsDao.update(if (isShow) 1 else 0, id)
-    fun getNextEvents() = eventsDao.getNextEvents(System.currentTimeMillis().todayZeroTime)
+    fun getNextEvents(limit: Int = 1) = eventsDao.getNextEvents(System.currentTimeMillis().todayZeroTime, limit = limit)
 
     fun getAllTags() = eventsDao.getTags()
 

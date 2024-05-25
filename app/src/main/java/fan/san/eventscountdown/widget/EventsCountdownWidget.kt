@@ -14,7 +14,6 @@ import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
-import androidx.glance.color.DayNightColorProvider
 import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
@@ -28,6 +27,7 @@ import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import dagger.hilt.android.EntryPointAccessors
 import fan.san.eventscountdown.common.defaultLightColor
+import fan.san.eventscountdown.common.defaultNightColor
 import fan.san.eventscountdown.common.dynamicTextColor
 import fan.san.eventscountdown.common.formatMd
 import fan.san.eventscountdown.common.getWeekDay
@@ -48,19 +48,19 @@ class EventsCountdownWidget : GlanceAppWidget() {
         provideContent {
             val prefs = currentState<Preferences>()
             val backgroundColorArgb =
-                prefs[CountdownWidgetStateKeys.backgroundColor] ?: defaultLightColor.toArgb()
-            val backgroundColor = Color(backgroundColorArgb)
-            val defaultTextStyle =
-                TextStyle(color = ColorProvider(backgroundColor.dynamicTextColor))
-
+                Color(prefs[CountdownWidgetStateKeys.backgroundColor] ?: defaultLightColor.toArgb())
             val title = prefs[CountdownWidgetStateKeys.title]?:""
             val date = prefs[CountdownWidgetStateKeys.date]?:0L
+            val followSystem = prefs[CountdownWidgetStateKeys.isFollowSystem]?:false
+            val backgroundColor = if (followSystem) androidx.glance.color.ColorProvider(day = defaultLightColor.copy(alpha = backgroundColorArgb.alpha), night = defaultNightColor.copy(backgroundColorArgb.alpha)) else ColorProvider(backgroundColorArgb)
+            val defaultTextStyle =
+                TextStyle(color = ColorProvider(backgroundColor.getColor(context).dynamicTextColor))
 
             GlanceTheme {
                 Box(
                     modifier = GlanceModifier.padding(horizontal = 12.dp, vertical = 8.dp)
                         .fillMaxSize().background(
-                            colorProvider = androidx.glance.color.ColorProvider(Color.White,Color.Black)
+                            colorProvider = backgroundColor
                         ), contentAlignment = Alignment.Center
                 ) {
 

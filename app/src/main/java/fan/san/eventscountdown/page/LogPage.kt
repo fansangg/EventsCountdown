@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import fan.san.eventscountdown.BuildConfig
 import fan.san.eventscountdown.common.CommonScaffold
 import fan.san.eventscountdown.common.DialogWrapper
@@ -49,8 +48,8 @@ import fan.san.eventscountdown.viewmodel.LogsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LogPage(navHostController: NavHostController) {
-
+fun LogPage() {
+    val navHostController = LocalNavController.current
     val viewModel = hiltViewModel<LogsViewModel>()
     LaunchedEffect(key1 = Unit) {
         viewModel.getAllLogDate()

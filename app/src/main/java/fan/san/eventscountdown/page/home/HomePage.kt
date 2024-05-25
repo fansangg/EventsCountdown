@@ -49,7 +49,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -60,15 +59,17 @@ import fan.san.eventscountdown.common.EmptyLottie
 import fan.san.eventscountdown.common.SpacerH
 import fan.san.eventscountdown.common.SpacerW
 import fan.san.eventscountdown.entity.MessageEvent
-import fan.san.eventscountdown.navigation.Pages
+import fan.san.eventscountdown.navigation.Routes
+import fan.san.eventscountdown.page.LocalNavController
 import fan.san.eventscountdown.viewmodel.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class,
     ExperimentalFoundationApi::class
 )
 @Composable
-fun HomePage(navController: NavController) {
+fun HomePage() {
 
+    val navController = LocalNavController.current
     val context = LocalContext.current
     val viewModel = hiltViewModel<MainViewModel>()
     LaunchedEffect(key1 = Unit) {
@@ -144,7 +145,7 @@ fun HomePage(navController: NavController) {
         title = "事件列表",
         showBack = false,
         titleDoublePress = {
-            navController.navigate(Pages.Log.route)
+            navController.navigate(Routes.Log)
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) {
