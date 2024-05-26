@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -195,7 +194,7 @@ fun NewEvent(cancel: () -> Unit, createEvents: (title: String, date: Long, tag: 
 
     val canCreate by remember {
         derivedStateOf {
-            tagsList.any { it.isSelected } && eventTitle.isNotEmpty() && date > 0
+            tagsList.any { it.isSelected } && eventTitle.isNotEmpty() && eventTitle.length <= 8 && date > 0
         }
     }
 
@@ -216,16 +215,16 @@ fun NewEvent(cancel: () -> Unit, createEvents: (title: String, date: Long, tag: 
                     .height(40.dp), contentAlignment = Alignment.Center
             ) {
 
-                Text(text = "新建事件", fontSize = 16.sp, fontWeight = FontWeight.W600)
+                Text(text = "新建事件", fontSize = 20.sp, fontWeight = FontWeight.W600)
             }
 
-            SpacerH(height = 8.dp)
+            SpacerH(height = 12.dp)
 
             OutlinedTextField(
                 value = eventTitle,
                 onValueChange = {
                     eventTitle = it
-                    isError = it.length > 12
+                    isError = it.length > 8
                 },
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -241,7 +240,7 @@ fun NewEvent(cancel: () -> Unit, createEvents: (title: String, date: Long, tag: 
                 singleLine = true,
                 supportingText = {
                     Text(
-                        text = if (isError) "${eventTitle.length}/12" else "",
+                        text = if (isError) "${eventTitle.length}/8" else "",
                         fontSize = 8.sp
                     )
                 },
@@ -257,7 +256,7 @@ fun NewEvent(cancel: () -> Unit, createEvents: (title: String, date: Long, tag: 
                     .padding(horizontal = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "时间", fontSize = 18.sp)
+                Text(text = "时间", fontSize = 16.sp)
                 Row(
                     modifier = Modifier.clickable(enabled = true, onClick = {
                         showDatePickerDialog = true
@@ -269,7 +268,7 @@ fun NewEvent(cancel: () -> Unit, createEvents: (title: String, date: Long, tag: 
                         text = if (date > 0L) DateFormat.format(
                             "yyyy年MM月dd日EEEE",
                             date
-                        ).toString() else "请选择日期", fontSize = 18.sp
+                        ).toString() else "请选择日期", fontSize = 16.sp
                     )
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -282,17 +281,16 @@ fun NewEvent(cancel: () -> Unit, createEvents: (title: String, date: Long, tag: 
 
             Text(
                 text = "选择标签",
-                fontSize = 18.sp,
+                fontSize = 16.sp,
                 modifier = Modifier.padding(horizontal = 4.dp)
             )
-            SpacerH(height = 6.dp)
+            SpacerH(height = 12.dp)
             ContextualFlowRow(
                 itemCount = tagsList.size,
                 modifier = Modifier
                     .fillMaxWidth()
                     .verticalScroll(scrollState)
-                    .heightIn(max = 200.dp)
-                    .padding(horizontal = 4.dp),
+                    .heightIn(max = 200.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 EventsTagsItem(eventsTagsBean = tagsList[it] , onClick = { bean ->
@@ -309,7 +307,7 @@ fun NewEvent(cancel: () -> Unit, createEvents: (title: String, date: Long, tag: 
                 }
             }
 
-            SpacerH(height = 15.dp)
+            SpacerH(height = 6.dp)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -317,7 +315,7 @@ fun NewEvent(cancel: () -> Unit, createEvents: (title: String, date: Long, tag: 
             ) {
                 Row {
                     TextButton(onClick = cancel) {
-                        Text(text = "取消", fontSize = 14.sp)
+                        Text(text = "取消", fontSize = 15.sp)
                     }
                     SpacerW(width = 6.dp)
                     TextButton(onClick = {
@@ -326,7 +324,7 @@ fun NewEvent(cancel: () -> Unit, createEvents: (title: String, date: Long, tag: 
                             tagsList.first { it.isSelected }.contet
                         )
                     }, enabled = canCreate) {
-                        Text(text = "确定", fontSize = 14.sp)
+                        Text(text = "确定", fontSize = 15.sp)
                     }
                 }
             }

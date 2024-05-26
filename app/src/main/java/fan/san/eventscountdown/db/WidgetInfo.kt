@@ -34,5 +34,8 @@ data class WidgetInfo(
         @Transaction
         @Query("SELECT * FROM widget_info where :id = id")
         fun getWidgetEvents(id:Int):List<WidgetWithEvents>
+
+        @Query("DELETE FROM widget_info WHERE id NOT IN (:ids)")
+        fun deleteIfNotExists(ids:List<Int>):Int
     }
 }

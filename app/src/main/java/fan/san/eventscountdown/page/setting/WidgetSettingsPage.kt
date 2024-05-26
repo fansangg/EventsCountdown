@@ -4,7 +4,6 @@ import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -67,26 +66,21 @@ import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WidgetSettingsPage(glanceId: Int) {
+fun WidgetSettingsPage() {
     val navHostController = LocalNavController.current
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    Log.d("fansangg", "#WidgetSettingsPage: glanceId == $glanceId")
 
 
     val viewModel = hiltViewModel<SettingsViewModel>()
 
     LaunchedEffect(key1 = Unit) {
-        viewModel.getWidgetInfo(glanceId)
+        navHostController.currentBackStackEntry?.savedStateHandle?.get<List<Events>>("selectedEvents")?.let {
+            viewModel.eventsList.clear()
+            viewModel.eventsList.addAll(it)
+        }
     }
-
-    LaunchedEffect(key1 = Unit) {
-        val r = navHostController.currentBackStackEntry?.savedStateHandle?.get<List<Events>>("list")
-        Log.d("fansangg", "WidgetSettingsPage: shoudaole r == $r")
-    }
-
-
 
     BackHandler() {
         cancelSetting(context)
@@ -133,7 +127,7 @@ fun WidgetSettingsPage(glanceId: Int) {
                             MaterialTheme.colorScheme.surfaceContainerHigh
                         )
                         .clickable {
-                            navHostController.navigate(route = Routes.SelectEvent(viewModel.eventsList))
+                            navHostController.navigate(route = Routes.SelectEvent(viewModel.eventsList.toMutableList()))
                         }, verticalArrangement = Arrangement.Center
                 ) {
                     Row(
@@ -186,10 +180,10 @@ fun WidgetSettingsPage(glanceId: Int) {
                 TextButton(
                     onClick = {
                         val result =
-                            Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, glanceId)
+                            Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, viewModel.glanceId)
                         (context as Activity).setResult(Activity.RESULT_OK, result)
                         scope.launch {
-                            viewModel.updateWidgetInfo(glanceId)
+                            viewModel.updateWidgetInfo()
                             context.finish()
                         }
                     },
@@ -343,7 +337,7 @@ private fun WidgetPreview(
         Box(
             modifier = Modifier
                 .size(
-                    width = Dp(width / 5f * 3),
+                    width = Dp(width / 5f * 4),
                     height = Dp(height / 7f)
                 )
                 .background(

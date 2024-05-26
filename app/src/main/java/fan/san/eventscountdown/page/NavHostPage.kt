@@ -1,5 +1,10 @@
 package fan.san.eventscountdown.page
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
@@ -7,7 +12,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import fan.san.eventscountdown.db.Events
 import fan.san.eventscountdown.navigation.CustomListNavType
 import fan.san.eventscountdown.navigation.Routes
@@ -28,10 +32,8 @@ fun NavHostPage(startDestination: Routes) {
                 HomePage()
             }
 
-            composable<Routes.Setting>(typeMap =  mapOf(
-                typeOf<List<Events>>() to CustomListNavType(Events::class.java,Events.serializer()))) {
-                val entity = it.toRoute<Routes.Setting>()
-                WidgetSettingsPage(entity.glanceId)
+            composable<Routes.Setting> {
+                WidgetSettingsPage()
             }
 
             composable<Routes.Log> {
@@ -44,10 +46,16 @@ fun NavHostPage(startDestination: Routes) {
                         Events::class.java,
                         Events.serializer()
                     )
-                )
-            ) {
-                val selectEvent = it.toRoute<Routes.SelectEvent>()
-                SelectEventPage(selectEvent.list)
+                ), enterTransition = {
+                    slideInVertically(animationSpec = tween(durationMillis = 400)) {
+                        it
+                    } + fadeIn()
+                }, exitTransition = {
+                    slideOutVertically(animationSpec = tween(durationMillis = 400)) {
+                        it
+                    } + fadeOut()
+                }) {
+                SelectEventPage()
             }
         }
     }

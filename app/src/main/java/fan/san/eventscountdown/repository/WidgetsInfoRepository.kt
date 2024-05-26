@@ -26,6 +26,8 @@ class WidgetsInfoRepository @Inject constructor(
 
     fun insert(widgetInfo: WidgetInfo) = dao.insert(widgetInfo)
 
+    fun deleteIfNotExists(ids:List<Int>) = dao.deleteIfNotExists(ids)
+
     fun insertEventWidgetCrossRef(eventWidgetCrossRefList: List<EventWidgetCrossRef>) = refDao.insert(eventWidgetCrossRefList)
 
     fun queryWidgetWithEvents(id:Int) = dao.getWidgetEvents(id)

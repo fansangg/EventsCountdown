@@ -8,12 +8,14 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import fan.san.eventscountdown.common.defaultLightColor
 import fan.san.eventscountdown.common.defaultNightColor
+import fan.san.eventscountdown.db.EventWidgetCrossRef
 import fan.san.eventscountdown.db.Events
 import fan.san.eventscountdown.db.WidgetInfo
 import fan.san.eventscountdown.repository.CountdownRepository
@@ -22,8 +24,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.milliseconds
 
 /**
  *@author  范三
@@ -34,9 +34,11 @@ import kotlin.time.Duration.Companion.milliseconds
 class SettingsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val countdownRepository: CountdownRepository,
-    private val widgetsInfoRepository: WidgetsInfoRepository
+    private val widgetsInfoRepository: WidgetsInfoRepository,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+    val glanceId = savedStateHandle.get<Int>("glanceId")?:0
 
     val eventsList = mutableStateListOf<Events>()
     val radioOptions = listOf("白色", "黑色")
@@ -45,16 +47,19 @@ class SettingsViewModel @Inject constructor(
     var selectedOption by mutableStateOf(radioOptions[0])
     var followSystem by mutableStateOf(false)
 
-    fun getWidgetInfo(id: Int) {
+    init {
         viewModelScope.launch(Dispatchers.IO) {
-            val ret = widgetsInfoRepository.queryWidgetWithEvents(id = id)
+            Log.d("fansangg", "GlanceId == $glanceId ")
+            val ret = widgetsInfoRepository.queryWidgetWithEvents(id = glanceId)
             if (ret.isNotEmpty()) {
-                currentColor = ret.first().widget.color
-                currentAlpha = currentColor.alpha
-                selectedOption = ret.first().widget.colorOption
-                followSystem = ret.first().widget.followSystem
-                eventsList.clear()
-                eventsList.addAll(ret.first().events)
+                withContext(Dispatchers.Main) {
+                    currentColor = ret.first().widget.color
+                    currentAlpha = currentColor.alpha
+                    selectedOption = ret.first().widget.colorOption
+                    followSystem = ret.first().widget.followSystem
+                    eventsList.clear()
+                    eventsList.addAll(ret.first().events)
+                }
             }
         }
     }
@@ -71,11 +76,15 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun updateWidgetInfo(glaceId: Int) {
+    fun updateWidgetInfo() {
 
-        val widgetInfo = WidgetInfo(glaceId, color = currentColor, selectedOption, followSystem = followSystem)
+        val widgetInfo = WidgetInfo(glanceId, color = currentColor, selectedOption, followSystem = followSystem)
         viewModelScope.launch(Dispatchers.IO) {
             widgetsInfoRepository.insert(widgetInfo)
+            val eventWidgetCrossRefList = eventsList.map {
+                EventWidgetCrossRef(it.id,glanceId.toLong())
+            }
+            widgetsInfoRepository.insertEventWidgetCrossRef(eventWidgetCrossRefList)
             widgetsInfoRepository.updateWidgetInfoState(widgetInfo, eventsList.first())
         }
     }

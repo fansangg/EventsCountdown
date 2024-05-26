@@ -15,6 +15,8 @@ import androidx.work.workDataOf
 import dagger.hilt.android.EntryPointAccessors
 import fan.san.eventscountdown.common.todayZeroTime
 import fan.san.eventscountdown.db.Logs
+import fan.san.eventscountdown.db.WidgetWithEvents
+import fan.san.eventscountdown.repository.CountdownRepository
 import fan.san.eventscountdown.repository.EventsCountdownEntryPoint
 import fan.san.eventscountdown.utils.CommonUtil
 import kotlinx.coroutines.Dispatchers
@@ -81,47 +83,57 @@ class UpdateCountdownWidgetWorker(
     }
 
     override suspend fun doWork(): Result {
-        val repository =
-            EntryPointAccessors.fromApplication<EventsCountdownEntryPoint>(context)
-                .getCountdownRepository()
+
+        val entryPoint = EntryPointAccessors.fromApplication<EventsCountdownEntryPoint>(context)
+        val repository = entryPoint.getCountdownRepository()
+        val widgetInfoRepository = entryPoint.getWidgetInfoRepository()
         repository.insertLogs(Logs.create("workmanager -- doWork"))
         repository.deleteBefore7()
-        val nextEvents = withContext(Dispatchers.IO) {
-            repository.getNextEvents()
-        }
 
-        withContext(Dispatchers.IO) {
-            repository.insertLogs(
-                Logs.create(
-                    """
-                --- 小组件更新 ---
-                ${
-                        if (nextEvents.isEmpty()) "无下一个事件" else "下一个事件=${nextEvents.first().title},剩余=${
-                            CommonUtil.getDaysDiff(
-                                nextEvents.first().startDateTime
-                            )
-                        }"
-                    }
-            """.trimIndent()
-                )
-            )
-        }
-
-        if (nextEvents.isNotEmpty()) {
-            GlanceAppWidgetManager(context).apply {
-                getGlanceIds(EventsCountdownWidget::class.java).forEach { glanceId ->
-                    updateAppWidgetState(context, glanceId) { prefs ->
-                        prefs[CountdownWidgetStateKeys.title] = nextEvents.first().title
-                        prefs[CountdownWidgetStateKeys.date] = nextEvents.first().startDateTime
-                    }
+        GlanceAppWidgetManager(context).apply {
+            val glanceIds = getGlanceIds(EventsCountdownWidget::class.java)
+            glanceIds.forEach { glanceId ->
+                val ret = withContext(Dispatchers.IO){
+                    widgetInfoRepository.queryWidgetWithEvents(getAppWidgetId(glanceId))
                 }
+                if (ret.isNotEmpty()){
+                    updateAppWidgetState(context, glanceId) { prefs ->
+                        prefs[CountdownWidgetStateKeys.title] = ret.first().events.first().title
+                        prefs[CountdownWidgetStateKeys.date] = ret.first().events.first().startDateTime
+                    }
 
-                EventsCountdownWidget().updateAll(context)
+                    logEventInfo(repository, ret)
+                }
             }
+            val deleteResult = widgetInfoRepository.deleteIfNotExists(glanceIds.map { getAppWidgetId(it) })
+            Log.d("fansangg", "doWork: deleteResult == $deleteResult")
+            EventsCountdownWidget().updateAll(context)
         }
 
         Log.d("fansangg", "UpdateWidgetWorker#doWork")
         return Result.success()
+    }
+
+    private suspend fun logEventInfo(
+        repository: CountdownRepository,
+        ret: List<WidgetWithEvents>
+    ) {
+        withContext(Dispatchers.IO) {
+            repository.insertLogs(
+                Logs.create(
+                    """
+                    --- 小组件更新 ---
+                    ${
+                        if (ret.first().events.isEmpty()) "无下一个事件" else "下一个事件=${ret.first().events.first().title},剩余=${
+                            CommonUtil.getDaysDiff(
+                                ret.first().events.first().startDateTime
+                            )
+                        }"
+                    }
+                """.trimIndent()
+                )
+            )
+        }
     }
 
 }
