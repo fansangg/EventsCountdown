@@ -12,13 +12,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import fan.san.eventscountdown.db.Events
-import fan.san.eventscountdown.navigation.CustomListNavType
 import fan.san.eventscountdown.navigation.Routes
 import fan.san.eventscountdown.page.home.HomePage
 import fan.san.eventscountdown.page.setting.SelectEventPage
 import fan.san.eventscountdown.page.setting.WidgetSettingsPage
-import kotlin.reflect.typeOf
 
 
 val LocalNavController = compositionLocalOf<NavController> { error("No NavController provided") }
@@ -40,13 +37,15 @@ fun NavHostPage(startDestination: Routes) {
                 LogPage()
             }
 
-            composable<Routes.SelectEvent>(
-                typeMap = mapOf(
+            /*typeMap = mapOf(
                     typeOf<List<Events>>() to CustomListNavType(
                         Events::class.java,
                         Events.serializer()
                     )
-                ), enterTransition = {
+                ),*/
+
+            composable<Routes.SelectEvent>(
+                 enterTransition = {
                     slideInVertically(animationSpec = tween(durationMillis = 400)) {
                         it
                     } + fadeIn()

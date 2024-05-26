@@ -9,6 +9,7 @@ import fan.san.eventscountdown.db.Events
 import fan.san.eventscountdown.repository.CountdownRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,7 +21,9 @@ class SelectEventsViewModel @Inject constructor(private val repository: Countdow
     val unSelectedEventsList = mutableStateListOf<Events>()
 
     init {
-        selectedEventsList.addAll(savedStateHandle.get<List<Events>>("list")?: emptyList())
+
+        val list = Json.decodeFromString<List<Events>>(savedStateHandle.get<String>("list")?:"")
+        selectedEventsList.addAll(list)
         getEventsList()
     }
 

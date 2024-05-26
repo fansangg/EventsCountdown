@@ -62,6 +62,8 @@ import fan.san.eventscountdown.page.LocalNavController
 import fan.san.eventscountdown.utils.CommonUtil
 import fan.san.eventscountdown.viewmodel.SettingsViewModel
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -127,7 +129,7 @@ fun WidgetSettingsPage() {
                             MaterialTheme.colorScheme.surfaceContainerHigh
                         )
                         .clickable {
-                            navHostController.navigate(route = Routes.SelectEvent(viewModel.eventsList.toMutableList()))
+                            navHostController.navigate(route = Routes.SelectEvent(Json.encodeToString(viewModel.eventsList.toMutableList())))
                         }, verticalArrangement = Arrangement.Center
                 ) {
                     Row(

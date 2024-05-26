@@ -1,6 +1,5 @@
 package fan.san.eventscountdown.navigation
 
-import fan.san.eventscountdown.db.Events
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -14,5 +13,5 @@ sealed class Routes {
     data class Setting(val glanceId: Int) : Routes()
 
     @Serializable
-    data class SelectEvent(val list:List<Events>):Routes()
+    data class SelectEvent(val list:String):Routes()
 }
