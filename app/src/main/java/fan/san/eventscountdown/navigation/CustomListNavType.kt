@@ -10,9 +10,11 @@ import kotlinx.serialization.json.Json
 
 class CustomListNavType<T:Parcelable>(
     private val clazz: Class<T>,
-    private val serializer: KSerializer<T>,
-):NavType<List<T>>(isNullableAllowed = false) {
-    override fun get(bundle: Bundle, key: String): List<T>? =
+    private val serializer: KSerializer<T>
+):NavType<ArrayList<T>>(isNullableAllowed = false) {
+
+    private val json = Json { encodeDefaults = true }
+    override fun get(bundle: Bundle, key: String): ArrayList<T>? =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             bundle.getParcelableArrayList(key, clazz)
         } else {
@@ -21,12 +23,12 @@ class CustomListNavType<T:Parcelable>(
         }
 
 
-    override fun parseValue(value: String): List<T>  = Json.decodeFromString(ListSerializer(serializer),value)
+    override fun parseValue(value: String): ArrayList<T>  = json.decodeFromString(value)
 
-    override fun serializeAsValue(value: List<T>): String = Json.encodeToString(ListSerializer(serializer),value)
+    override fun serializeAsValue(value: ArrayList<T>): String = json.encodeToString(ListSerializer(serializer),value)
 
-    override fun put(bundle: Bundle, key: String, value: List<T>) {
-            bundle.putParcelableArrayList(key,value as ArrayList)
+    override fun put(bundle: Bundle, key: String, value: ArrayList<T>) {
+            bundle.putParcelableArrayList(key, value)
     }
 
 }
