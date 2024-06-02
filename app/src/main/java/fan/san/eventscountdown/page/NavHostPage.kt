@@ -1,10 +1,7 @@
 package fan.san.eventscountdown.page
 
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
@@ -29,7 +26,32 @@ fun NavHostPage(startDestination: Routes) {
                 HomePage()
             }
 
-            composable<Routes.Setting> {
+            composable<Routes.Setting>(
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(500)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(500)
+                    )
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                        animationSpec = tween(500)
+                    )
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                        animationSpec = tween(500)
+                    )
+                }
+            ){
                 WidgetSettingsPage()
             }
 
@@ -45,15 +67,32 @@ fun NavHostPage(startDestination: Routes) {
                 ),*/
 
             composable<Routes.SelectEvent>(
-                 enterTransition = {
-                    slideInVertically(animationSpec = tween(durationMillis = 400)) {
-                        it
-                    } + fadeIn()
-                }, exitTransition = {
-                    slideOutVertically(animationSpec = tween(durationMillis = 400)) {
-                        it
-                    } + fadeOut()
-                }) {
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(500)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(500)
+                    )
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                        animationSpec = tween(500)
+                    )
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                        animationSpec = tween(500)
+                    )
+                }
+
+            ) {
                 SelectEventPage()
             }
         }
