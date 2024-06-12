@@ -93,19 +93,22 @@ class UpdateCountdownWidgetWorker(
         GlanceAppWidgetManager(context).apply {
             val glanceIds = getGlanceIds(EventsCountdownWidget::class.java)
             glanceIds.forEach { glanceId ->
-                val ret = withContext(Dispatchers.IO){
+                val ret = withContext(Dispatchers.IO) {
                     widgetInfoRepository.queryWidgetWithEvents(getAppWidgetId(glanceId))
                 }
-                if (ret.isNotEmpty()){
+                if (ret.isNotEmpty()) {
                     updateAppWidgetState(context, glanceId) { prefs ->
-                        prefs[CountdownWidgetStateKeys.title] = ret.first().events.first().title
-                        prefs[CountdownWidgetStateKeys.date] = ret.first().events.first().startDateTime
+                        prefs[CountdownWidgetStateKeys.title] =
+                            ret.first().events.first { it.startDateTime > System.currentTimeMillis() }.title
+                        prefs[CountdownWidgetStateKeys.date] =
+                            ret.first().events.first { it.startDateTime > System.currentTimeMillis() }.startDateTime
                     }
 
                     logEventInfo(repository, ret)
                 }
             }
-            val deleteResult = widgetInfoRepository.deleteIfNotExists(glanceIds.map { getAppWidgetId(it) })
+            val deleteResult =
+                widgetInfoRepository.deleteIfNotExists(glanceIds.map { getAppWidgetId(it) })
             Log.d("fansangg", "doWork: deleteResult == $deleteResult")
             EventsCountdownWidget().updateAll(context)
         }

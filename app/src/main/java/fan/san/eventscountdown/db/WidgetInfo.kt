@@ -35,6 +35,10 @@ data class WidgetInfo(
         @Query("SELECT * FROM widget_info where :id = id")
         fun getWidgetEvents(id:Int):List<WidgetWithEvents>
 
+        @Transaction
+        @Query("SELECT events.* FROM events INNER JOIN EventWidgetCrossRef ON events.id = EventWidgetCrossRef.eventId WHERE EventWidgetCrossRef.widgetId = :widgetId AND events.start_date_time > strftime('%s', 'now') * 1000 ORDER BY events.start_date_time LIMIT 1")
+        fun getNextEventsByWidgetId(widgetId:Int):List<Events>
+
         @Query("DELETE FROM widget_info WHERE id NOT IN (:ids)")
         fun deleteIfNotExists(ids:List<Int>):Int
     }

@@ -351,14 +351,14 @@ private fun WidgetPreview(
             if (viewModel.eventsList.isNotEmpty()) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     Text(
-                        text = viewModel.eventsList.first().title,
+                        text = viewModel.eventsList.first{it.startDateTime > System.currentTimeMillis()}.title,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.W700,
                         color = viewModel.currentColor.dynamicTextColor
                     )
 
                     Text(
-                        text = "${viewModel.eventsList.first().startDateTime.formatMd}  ${viewModel.eventsList.first().startDateTime.getWeekDay}",
+                        text = "${viewModel.eventsList.first{it.startDateTime > System.currentTimeMillis()}.startDateTime.formatMd}  ${viewModel.eventsList.first{it.startDateTime > System.currentTimeMillis()}.startDateTime.getWeekDay}",
                         fontSize = 13.sp,
                         fontWeight = FontWeight.W700,
                         color = viewModel.currentColor.dynamicTextColor
@@ -376,7 +376,7 @@ private fun WidgetPreview(
                                 color = viewModel.currentColor.dynamicTextColor
                             )
                             Text(
-                                text = CommonUtil.getDaysDiff(viewModel.eventsList.first().startDateTime),
+                                text = CommonUtil.getDaysDiff(viewModel.eventsList.first{it.startDateTime > System.currentTimeMillis()}.startDateTime),
                                 modifier = Modifier.alignByBaseline(),
                                 fontSize = 37.sp,
                                 color = viewModel.currentColor.dynamicTextColor,

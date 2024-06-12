@@ -32,6 +32,8 @@ class WidgetsInfoRepository @Inject constructor(
 
     fun queryWidgetWithEvents(id:Int) = dao.getWidgetEvents(id)
 
+    fun getNextEventsByWidgetId(id:Int) = dao.getNextEventsByWidgetId(id)
+
     suspend fun updateWidgetInfoState(widgetInfo: WidgetInfo, nextEvents:Events){
         GlanceAppWidgetManager(context).apply {
             updateAppWidgetState(context, getGlanceIdBy(widgetInfo.id)) {

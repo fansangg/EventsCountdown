@@ -85,7 +85,7 @@ class SettingsViewModel @Inject constructor(
                 EventWidgetCrossRef(it.id,glanceId.toLong())
             }
             widgetsInfoRepository.insertEventWidgetCrossRef(eventWidgetCrossRefList)
-            widgetsInfoRepository.updateWidgetInfoState(widgetInfo, eventsList.first())
+            widgetsInfoRepository.updateWidgetInfoState(widgetInfo, eventsList.first{it.startDateTime > System.currentTimeMillis()})
         }
     }
 }
