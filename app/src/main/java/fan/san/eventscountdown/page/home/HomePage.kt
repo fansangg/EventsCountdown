@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -39,6 +40,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -48,7 +50,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -63,7 +67,8 @@ import fan.san.eventscountdown.navigation.Routes
 import fan.san.eventscountdown.page.LocalNavController
 import fan.san.eventscountdown.viewmodel.MainViewModel
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class,
+@OptIn(
+    ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class,
     ExperimentalFoundationApi::class
 )
 @Composable
@@ -111,6 +116,14 @@ fun HomePage() {
         mutableStateOf(false)
     }
 
+    var showPickRangeDialog by remember {
+        mutableStateOf(false to 0L)
+    }
+
+    var showDeleteDialog by remember {
+        mutableStateOf(false)
+    }
+
     val messageEvent by viewModel.messageEvent.collectAsState(initial = MessageEvent.None)
 
     HandlerMessage(messageEvent, snackbarHostState)
@@ -144,6 +157,11 @@ fun HomePage() {
     CommonScaffold(
         title = "事件列表",
         showBack = false,
+        showAction = viewModel.allEventsList.isNotEmpty(),
+        actionIcon = Icons.Default.Delete,
+        actionClick = {
+            showDeleteDialog = true
+        },
         titleDoublePress = {
             navController.navigate(Routes.Log)
         },
@@ -185,8 +203,22 @@ fun HomePage() {
                             dismiss = { showImportDialog = false }) {
                             ChooseAccountDialog(accountSelected = { id ->
                                 showImportDialog = false
-                                viewModel.getCalendarEvents(id)
+                                showPickRangeDialog = true to id
                             })
+                        }
+                    }
+
+                    showPickRangeDialog.first -> {
+                        DialogWrapper(
+                            dismissOnClickOutside = true,
+                            dismiss = {
+                                showPickRangeDialog = false to 0L
+                            }
+                        ) {
+                            ChooseRangeDialog {
+                                viewModel.getCalendarEvents(showPickRangeDialog.second, it)
+                                showPickRangeDialog = false to 0
+                            }
                         }
                     }
 
@@ -225,6 +257,18 @@ fun HomePage() {
                                     permissionState.launchPermissionRequest()
                                     lastRequestPermissionTime = System.currentTimeMillis()
                                 }
+                            }
+                        }
+                    }
+
+                    showDeleteDialog -> {
+                        DialogWrapper(
+                            dismiss = { showDeleteDialog = false },
+                            dismissOnClickOutside = true
+                        ) {
+                            DeleteDialog {
+                                showDeleteDialog = false
+                                viewModel.deleteEventsByType(it)
                             }
                         }
                     }
@@ -378,5 +422,81 @@ private fun NoEvents(newEvent: () -> Unit, importClick: () -> Unit) {
             Text(text = "从日历导入", modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
         }
 
+    }
+}
+
+@Composable
+private fun DeleteDialog(ret: (String) -> Unit) {
+    val vm = viewModel<MainViewModel>()
+    val tagsList = remember {
+        mutableStateListOf<String>()
+    }
+
+    LaunchedEffect(Unit) {
+        tagsList.addAll(vm.getAllTags())
+
+    }
+    ElevatedCard(
+        modifier = Modifier
+            .fillMaxWidth(.76f)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 20.dp)
+        ) {
+
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Text("选择要批量删除的类型", fontSize = 18.sp)
+            }
+
+            SpacerH(15.dp)
+
+            Card(
+                onClick = { ret.invoke("0") },
+                modifier = Modifier
+                    .height(50.dp)
+                    .fillMaxWidth(),
+                colors = CardDefaults.cardColors()
+                    .copy(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
+            ) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(text = "相同事件")
+                }
+
+            }
+
+            SpacerH(height = 12.dp)
+
+            tagsList.forEachIndexed { index, data ->
+                Card(
+                    onClick = { ret.invoke(data) },
+                    Modifier
+                        .height(50.dp)
+                        .fillMaxWidth(),
+                    colors = CardDefaults.cardColors()
+                        .copy(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
+                ) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(text = data)
+                    }
+                }
+
+                SpacerH(height = 12.dp)
+            }
+
+            Card(
+                onClick = { ret.invoke("1") },
+                Modifier
+                    .height(50.dp)
+                    .fillMaxWidth(),
+                colors = CardDefaults.cardColors()
+                    .copy(containerColor = MaterialTheme.colorScheme.errorContainer)
+            ) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(text = "全部")
+                }
+            }
+        }
     }
 }

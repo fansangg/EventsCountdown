@@ -39,6 +39,8 @@ data class Events(
 
         @Delete
         suspend fun delete(vararg events: Events):Int
+        @Delete
+        suspend fun delete(events: List<Events>):Int
         @Query("UPDATE events SET isShow = :isShow where id = :id")
         suspend fun update(isShow: Int,id: Long):Int
 
@@ -47,5 +49,11 @@ data class Events(
 
         @Query("SELECT DISTINCT tag FROM events")
         fun getTags():List<String>
+
+        @Query("DELETE FROM events")
+        fun deleteAll(): Int
+
+        @Query("DELETE FROM events where tag = :tag")
+        fun deleteByTag(tag: String): Int
     }
 }

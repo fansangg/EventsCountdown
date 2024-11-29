@@ -11,6 +11,7 @@ import fan.san.eventscountdown.db.Logs
 import fan.san.eventscountdown.entity.CalendarAccountBean
 import fan.san.eventscountdown.utils.CommonUtil
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -27,17 +28,18 @@ class CountdownRepository @Inject constructor(
     suspend fun insertEvents(events: List<Events>) = eventsDao.insert(events)
     suspend fun delete(events: Events) = eventsDao.delete(events)
     suspend fun update(isShow: Boolean, id: Long) = eventsDao.update(if (isShow) 1 else 0, id)
-    fun getNextEvents(limit: Int = 1) = eventsDao.getNextEvents(System.currentTimeMillis().todayZeroTime, limit = limit)
+    fun getNextEvents(limit: Int = 1) =
+        eventsDao.getNextEvents(System.currentTimeMillis().todayZeroTime, limit = limit)
 
     fun getAllTags() = eventsDao.getTags()
 
     fun deleteBefore7() = logsDao.deleteBefore7()
 
-    fun insertLogs(log:Logs) = logsDao.insert(log)
+    fun insertLogs(log: Logs) = logsDao.insert(log)
 
-    fun queryLogsByDate(date:String):Flow<List<Logs>> = logsDao.queryByDate(date)
+    fun queryLogsByDate(date: String): Flow<List<Logs>> = logsDao.queryByDate(date)
 
-    fun queryLogDates() : List<String> = logsDao.queryDates()
+    fun queryLogDates(): List<String> = logsDao.queryDates()
 
     fun queryCalendarAccounts(): List<CalendarAccountBean> {
         val list = mutableListOf<CalendarAccountBean>()
@@ -75,11 +77,29 @@ class CountdownRepository @Inject constructor(
         return list
     }
 
-    fun getCalendarEvents(calendarId: Long): List<Events> {
+    /**
+     * @param type 0 -- 今年，1 -- 未来半年，2 -- 未来一年
+     */
+    fun getCalendarEvents(calendarId: Long, type: Int): List<Events> {
         val list = mutableListOf<Events>()
         val builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
-        ContentUris.appendId(builder, CommonUtil.getThisYearFristTime())
-        ContentUris.appendId(builder, CommonUtil.getThisYearLastTime())
+        when (type) {
+            0 -> {
+                ContentUris.appendId(builder, CommonUtil.getThisYearFristTime())
+                ContentUris.appendId(builder, CommonUtil.getThisYearLastTime())
+            }
+
+            1 -> {
+                ContentUris.appendId(builder, System.currentTimeMillis().todayZeroTime)
+                ContentUris.appendId(builder, CommonUtil.getCommingHalfYear())
+            }
+
+            2 -> {
+                ContentUris.appendId(builder, System.currentTimeMillis().todayZeroTime)
+                ContentUris.appendId(builder, CommonUtil.getCommingFullYear())
+            }
+        }
+
         context.contentResolver.query(
             builder.build(),
             arrayOf(
@@ -113,12 +133,34 @@ class CountdownRepository @Inject constructor(
                     val name =
                         it.getString(it.getColumnIndexOrThrow(CalendarContract.Instances.CALENDAR_DISPLAY_NAME))
                     val end = it.getLong(it.getColumnIndexOrThrow(CalendarContract.Instances.END))
-                    list.add(Events(originId = id, title = title,
-                        startDateTime = begin.todayZeroTime, isShow = 1, tag = name))
+                    list.add(
+                        Events(
+                            originId = id, title = title,
+                            startDateTime = begin.todayZeroTime, isShow = 1, tag = name
+                        )
+                    )
                 } while (it.moveToNext())
             }
         }
 
         return list
+    }
+
+    suspend fun clearSameEvents(): Int {
+        val needDelete = mutableListOf<Events>()
+        getAllEvents().first().groupBy { it.title }.filter { it.value.size > 1 }.forEach { k,v ->
+            v.groupBy { it.startDateTime }.filter { it.value.size > 1 }.forEach { k,v ->
+               needDelete.addAll(v.subList(0,v.size - 1))
+            }
+        }
+        return eventsDao.delete(needDelete)
+    }
+
+    suspend fun deleteAllEvents():Int{
+        return eventsDao.delete()
+    }
+
+    suspend fun deleteByTag(tag: String):Int{
+        return eventsDao.deleteByTag(tag)
     }
 }

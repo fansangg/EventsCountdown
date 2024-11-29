@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -76,18 +78,18 @@ fun ChooseAccountDialog(
                     .fillMaxWidth()
                     .height(40.dp)
             ) {
-                val (titile, refresh) = createRefs()
+                val (title, refresh) = createRefs()
 
                 Text(
                     text = "选择日历账户",
                     fontSize = 18.sp,
-                    modifier = Modifier.constrainAs(titile) {
+                    modifier = Modifier.constrainAs(title) {
                         centerTo(parent)
                     })
 
                 RefreshAccount(modifier = Modifier.constrainAs(refresh) {
-                    centerVerticallyTo(titile)
-                    start.linkTo(titile.end)
+                    centerVerticallyTo(title)
+                    start.linkTo(title.end)
                 }, getAccoounts = {
                     viewModel.getCalendarAccounts()
                 })
@@ -113,6 +115,70 @@ fun ChooseAccountDialog(
                             accountSelected.invoke(it.id)
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ChooseRangeDialog(ret:(Int) -> Unit){
+    ElevatedCard(
+        modifier = Modifier
+            .fillMaxWidth(.76f)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 20.dp)
+        ) {
+
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+                Text("选择要导入事件的范围", fontSize = 18.sp)
+            }
+
+            SpacerH(15.dp)
+
+            Card(
+                onClick = { ret.invoke(0) },
+                modifier = Modifier
+                    .height(50.dp)
+                    .fillMaxWidth(),
+                colors = CardDefaults.cardColors()
+                    .copy(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
+            ) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(text = "全年事件")
+                }
+
+            }
+            SpacerH(height = 12.dp)
+
+            Card(
+                onClick = { ret.invoke(1) },
+                Modifier
+                    .height(50.dp)
+                    .fillMaxWidth(),
+                colors = CardDefaults.cardColors()
+                    .copy(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
+            ) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(text = "未来半年")
+                }
+            }
+
+            SpacerH(height = 12.dp)
+
+            Card(
+                onClick = { ret.invoke(2) },
+                Modifier
+                    .height(50.dp)
+                    .fillMaxWidth(),
+                colors = CardDefaults.cardColors()
+                    .copy(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
+            ) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(text = "未来一年")
                 }
             }
         }

@@ -59,9 +59,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun getCalendarEvents(accountId: Long) {
+    fun getCalendarEvents(accountId: Long,type: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = repository.getCalendarEvents(accountId)
+            val result = repository.getCalendarEvents(accountId,type)
             val count = repository.insertEvents(result)
             val ignoreCount = count.count { it == -1L }
             val sb = StringBuilder()
@@ -88,5 +88,42 @@ class MainViewModel @Inject constructor(
                     allEventsList.addAll(it)
                 }
         }
+    }
+
+    fun deleteEventsByType(type: String){
+        viewModelScope.launch(Dispatchers.IO){
+            when(type){
+                "0" -> {
+                    val ret = clearSameEvents()
+                    if (ret == 0){
+                        _messageEvent.send(MessageEvent.SnackBarMessage("没有重复事件"))
+                    }else{
+                        _messageEvent.send(MessageEvent.SnackBarMessage("已删除${ret}条事件"))
+                    }
+                }
+
+                "1" -> {
+                    val ret = deleteAll()
+                    _messageEvent.send(MessageEvent.SnackBarMessage("已删除${ret}条事件"))
+                }
+
+                else -> {
+                    val ret = deleteByTag(type)
+                    _messageEvent.send(MessageEvent.SnackBarMessage("已删除${ret}条事件"))
+                }
+            }
+        }
+    }
+
+    private suspend fun deleteAll(): Int{
+        return repository.deleteAllEvents()
+    }
+
+    private suspend fun deleteByTag(tag: String): Int{
+        return repository.deleteByTag(tag)
+    }
+
+    private suspend fun clearSameEvents():Int{
+        return repository.clearSameEvents()
     }
 }
