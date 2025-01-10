@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.AutoMigrationSpec
 
 @Database(
-    version = 7,
+    version = 8,
     entities = [Events::class, Logs::class, WidgetInfo::class, EventWidgetCrossRef::class],
     autoMigrations = [AutoMigration(from = 1, to = 2), AutoMigration(
         from = 2,
@@ -16,7 +16,7 @@ import androidx.room.migration.AutoMigrationSpec
     ), AutoMigration(from = 3, to = 4), AutoMigration(from = 4, to = 5), AutoMigration(
         from = 5,
         to = 6
-    ), AutoMigration(from = 6, to = 7, spec = AppDb.RenameWidgetInfo::class)]
+    ), AutoMigration(from = 6, to = 7, spec = AppDb.RenameWidgetInfo::class),AutoMigration(from = 7, to = 8, spec = AppDb.RenameEventWidgetCrossRef::class)]
 )
 abstract class AppDb : RoomDatabase() {
     abstract fun eventsDao(): Events.EventsDao
@@ -26,4 +26,7 @@ abstract class AppDb : RoomDatabase() {
 
     @RenameTable.Entries(RenameTable(fromTableName = "widget_infos", toTableName = "widget_info"))
     class RenameWidgetInfo : AutoMigrationSpec
+
+    @RenameTable.Entries(RenameTable(fromTableName = "EventWidgetCrossRef", toTableName = "event_widget_cross_ref"))
+    class RenameEventWidgetCrossRef : AutoMigrationSpec
 }

@@ -30,6 +30,8 @@ class WidgetsInfoRepository @Inject constructor(
 
     fun insertEventWidgetCrossRef(eventWidgetCrossRefList: List<EventWidgetCrossRef>) = refDao.insert(eventWidgetCrossRefList)
 
+    fun deleteEventWidgetCrossRef(list: List<Long>) = refDao.delete(list)
+
     fun queryWidgetWithEvents(id:Int) = dao.getWidgetEvents(id)
 
     fun getNextEventsByWidgetId(id:Int) = dao.getNextEventsByWidgetId(id)

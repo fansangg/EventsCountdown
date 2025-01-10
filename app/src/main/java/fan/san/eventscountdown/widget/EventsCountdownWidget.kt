@@ -19,7 +19,9 @@ import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
+import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
@@ -51,7 +53,7 @@ class EventsCountdownWidget : GlanceAppWidget() {
                 Color(prefs[CountdownWidgetStateKeys.backgroundColor] ?: defaultLightColor.toArgb())
             val title = prefs[CountdownWidgetStateKeys.title]?:""
             val date = prefs[CountdownWidgetStateKeys.date]?:0L
-            val followSystem = prefs[CountdownWidgetStateKeys.isFollowSystem]?:false
+            val followSystem = prefs[CountdownWidgetStateKeys.isFollowSystem] == true
             val backgroundColor = if (followSystem) androidx.glance.color.ColorProvider(day = defaultLightColor.copy(alpha = backgroundColorArgb.alpha), night = defaultNightColor.copy(backgroundColorArgb.alpha)) else ColorProvider(backgroundColorArgb)
             val defaultTextStyle =
                 TextStyle(color = ColorProvider(backgroundColor.getColor(context).dynamicTextColor))
@@ -81,9 +83,11 @@ class EventsCountdownWidget : GlanceAppWidget() {
                                 )
                             )
 
+                            Spacer(modifier = GlanceModifier.height(2.dp))
+
                             Text(
                                 text = "${date.formatMd}  ${date.getWeekDay}",
-                                style = defaultTextStyle.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                style = defaultTextStyle.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold)
                             )
 
                             Box(
@@ -91,15 +95,15 @@ class EventsCountdownWidget : GlanceAppWidget() {
                                 contentAlignment = Alignment.BottomEnd
                             ) {
                                 Row {
-                                    Text(text = "还剩 ", style = defaultTextStyle.copy(fontSize = 16.sp))
+                                    Text(text = "还剩 ", style = defaultTextStyle.copy(fontSize = 14.sp))
                                     Text(
                                         text = CommonUtil.getDaysDiff(date),
                                         style = defaultTextStyle.copy(
-                                            fontSize = 37.sp,
+                                            fontSize = 26.sp,
                                             fontWeight = FontWeight.Bold
                                         )
                                     )
-                                    Text(text = " 天", style = defaultTextStyle.copy(fontSize = 16.sp))
+                                    Text(text = " 天", style = defaultTextStyle.copy(fontSize = 14.sp))
                                 }
                             }
                         }

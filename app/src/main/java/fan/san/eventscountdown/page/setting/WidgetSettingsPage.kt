@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -40,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
@@ -129,7 +131,13 @@ fun WidgetSettingsPage() {
                             MaterialTheme.colorScheme.surfaceContainerHigh
                         )
                         .clickable {
-                            navHostController.navigate(route = Routes.SelectEvent(Json.encodeToString(viewModel.eventsList.toMutableList())))
+                            navHostController.navigate(
+                                route = Routes.SelectEvent(
+                                    Json.encodeToString(
+                                        viewModel.eventsList.toMutableList()
+                                    )
+                                )
+                            )
                         }, verticalArrangement = Arrangement.Center
                 ) {
                     Row(
@@ -282,11 +290,12 @@ private fun AttributeSetting(viewModel: SettingsViewModel) {
                     viewModel.changeColor(isDark)
                 }, steps = 9, valueRange = 0f..1f, modifier = Modifier
                     .weight(1f)
-                    .height(40.dp), track = {
-                    SliderDefaults.Track(
-                        sliderState = it,
-                        modifier = Modifier.scale(scaleX = 1f, scaleY = 1.2f)
-                    )
+                    .height(40.dp), thumb = {
+                    val color = SliderDefaults.colors().thumbColor
+                    Canvas(modifier = Modifier.size(24.dp)) {
+                        drawCircle(color = color)
+                        drawCircle(color = Color.Black, radius = size.minDimension / 2.5f)
+                    }
                 }
             )
         }
@@ -357,9 +366,11 @@ private fun WidgetPreview(
                         color = viewModel.currentColor.dynamicTextColor
                     )
 
+                    SpacerH(2.dp)
+
                     Text(
                         text = "${viewModel.eventsList.first{it.startDateTime > System.currentTimeMillis()}.startDateTime.formatMd}  ${viewModel.eventsList.first{it.startDateTime > System.currentTimeMillis()}.startDateTime.getWeekDay}",
-                        fontSize = 13.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.W700,
                         color = viewModel.currentColor.dynamicTextColor
                     )
@@ -372,20 +383,20 @@ private fun WidgetPreview(
                             Text(
                                 text = "还剩 ",
                                 modifier = Modifier.alignByBaseline(),
-                                fontSize = 16.sp,
+                                fontSize = 14.sp,
                                 color = viewModel.currentColor.dynamicTextColor
                             )
                             Text(
                                 text = CommonUtil.getDaysDiff(viewModel.eventsList.first{it.startDateTime > System.currentTimeMillis()}.startDateTime),
                                 modifier = Modifier.alignByBaseline(),
-                                fontSize = 37.sp,
+                                fontSize = 26.sp,
                                 color = viewModel.currentColor.dynamicTextColor,
                                 fontWeight = FontWeight.W700
                             )
                             Text(
                                 text = " 天",
                                 modifier = Modifier.alignByBaseline(),
-                                fontSize = 16.sp,
+                                fontSize = 14.sp,
                                 color = viewModel.currentColor.dynamicTextColor
                             )
                         }

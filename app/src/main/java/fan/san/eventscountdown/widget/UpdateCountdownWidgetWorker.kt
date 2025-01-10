@@ -104,6 +104,17 @@ class UpdateCountdownWidgetWorker(
                             ret.first().events.first { it.startDateTime > System.currentTimeMillis() }.startDateTime
                     }
 
+                    //删除已过的事件
+                    withContext(Dispatchers.IO) {
+                        val needDeleteList = mutableListOf<Long>()
+                        ret.first().events.forEach {
+                            if (it.startDateTime < System.currentTimeMillis()){
+                                needDeleteList.add(it.id)
+                            }
+                        }
+                        widgetInfoRepository.deleteEventWidgetCrossRef(needDeleteList)
+                    }
+
                     logEventInfo(repository, ret)
                 }
             }
@@ -127,9 +138,9 @@ class UpdateCountdownWidgetWorker(
                     """
                     --- 小组件更新 ---
                     ${
-                        if (ret.first().events.isEmpty()) "无下一个事件" else "下一个事件=${ret.first().events.first().title},剩余=${
+                        if (ret.first().events.isEmpty()) "无下一个事件" else "下一个事件=${ret.first().events.first{it.startDateTime > System.currentTimeMillis()}.title},剩余=${
                             CommonUtil.getDaysDiff(
-                                ret.first().events.first().startDateTime
+                                ret.first().events.first{it.startDateTime > System.currentTimeMillis()}.startDateTime
                             )
                         }"
                     }
