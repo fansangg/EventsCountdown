@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -13,12 +14,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -44,13 +47,20 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.glance.GlanceModifier
+import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.padding
 import androidx.hilt.navigation.compose.hiltViewModel
+import fan.san.eventscountdown.R
 import fan.san.eventscountdown.common.CommonScaffold
 import fan.san.eventscountdown.common.HDivider
 import fan.san.eventscountdown.common.SpacerH
@@ -330,8 +340,13 @@ private fun WidgetPreview(
     viewModel: SettingsViewModel,
 ) {
 
-    val width = LocalConfiguration.current.screenWidthDp
-    val height = LocalConfiguration.current.screenHeightDp
+    val localDensity = LocalDensity.current
+    val width = with(localDensity){
+        LocalWindowInfo.current.containerSize.width.toDp()
+    }
+    val height = with(localDensity){
+        LocalWindowInfo.current.containerSize.height.toDp()
+    }
 
     Column(
         modifier = Modifier
@@ -347,18 +362,42 @@ private fun WidgetPreview(
     ) {
         Box(
             modifier = Modifier
-                .size(
-                    width = Dp(width / 5f * 4),
-                    height = Dp(height / 7f)
-                )
-                .background(
-                    viewModel.currentColor,
-                    shape = RoundedCornerShape(12.dp)
-                )
-                .padding(horizontal = 14.dp, vertical = 10.dp)
+                .size(145.dp,65.dp)
+                .clip(RoundedCornerShape(30.dp))
         ) {
+            Image(painter = painterResource(R.drawable.countdown_bg),contentDescription = null)
             if (viewModel.eventsList.isNotEmpty()) {
-                Column(modifier = Modifier.fillMaxSize()) {
+                Row(
+                    modifier = Modifier.fillMaxSize().padding(start = 7.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier.size(46.dp)
+                            .background(color = Color.White).clip(RoundedCornerShape(23.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = CommonUtil.getDaysDiff(viewModel.eventsList.first{it.startDateTime > System.currentTimeMillis()}.startDateTime),
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Column {
+                        Text(
+                            text = viewModel.eventsList.first{it.startDateTime > System.currentTimeMillis()}.title,
+                            color = Color(0xff262626),
+                            fontWeight = FontWeight.Medium
+                        )
+
+                        Text(
+                            text = "天剩余",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Normal
+                        )
+                    }
+                }
+                /*Column(modifier = Modifier.fillMaxSize()) {
                     Text(
                         text = viewModel.eventsList.first{it.startDateTime > System.currentTimeMillis()}.title,
                         fontSize = 20.sp,
@@ -401,13 +440,14 @@ private fun WidgetPreview(
                             )
                         }
                     }
-                }
+                }*/
             } else {
                 Text(
                     text = "当前无事件",
-                    fontSize = 22.sp,
+                    fontSize = 18.sp,
                     fontWeight = FontWeight.W700,
-                    color = viewModel.currentColor.dynamicTextColor,
+                    //color = viewModel.currentColor.dynamicTextColor,
+                    color = Color(0xff262626),
                     modifier = Modifier.align(alignment = Alignment.Center)
                 )
             }
